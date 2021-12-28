@@ -4,6 +4,7 @@ import logging
 import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
+import netvlad
 
 
 class GeoLocalizationNet(nn.Module):
@@ -11,10 +12,13 @@ class GeoLocalizationNet(nn.Module):
     The backbone is a (cropped) ResNet-18, and the aggregation is a L2
     normalization followed by max pooling.
     """
-    def __init__(self, args):
+    def __init__(self, args, use_netvlad = False):
         super().__init__()
         self.backbone = get_backbone(args)
-        self.aggregation = nn.Sequential(L2Norm(),
+        if use_netvlad:
+            self.aggregation = netvlad.NetVLAD()
+        else:
+            self.aggregation = nn.Sequential(L2Norm(),
                                          torch.nn.AdaptiveAvgPool2d(1),
                                          Flatten())
     def forward(self, x):

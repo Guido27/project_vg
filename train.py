@@ -41,7 +41,7 @@ test_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "test"
 logging.info(f"Test set: {test_ds}")
 
 #### Initialize model
-model = network.GeoLocalizationNet(args)
+model = network.GeoLocalizationNet(args, use_netvlad=True)
 model = model.to(args.device)
 
 #### Setup Optimizer and Loss
