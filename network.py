@@ -16,7 +16,7 @@ class GeoLocalizationNet(nn.Module):
         super().__init__()
         self.backbone = get_backbone(args)
         if use_netvlad:
-            self.aggregation = netvlad.NetVLAD()
+            self.aggregation = netvlad.NetVLAD(dim=256)
         else:
             self.aggregation = nn.Sequential(L2Norm(),
                                          torch.nn.AdaptiveAvgPool2d(1),
