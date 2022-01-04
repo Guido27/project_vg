@@ -21,8 +21,8 @@ class GeoLocalizationNet(nn.Module):
             args.features_dim *= args.netvlad_clusters
         else:
             self.aggregation = nn.Sequential(L2Norm(),
-                                         torch.nn.AdaptiveAvgPool2d(1),
-                                         Flatten())
+                                        torch.nn.AdaptiveAvgPool2d(1),
+                                        Flatten())
     def forward(self, x):
         x = self.backbone(x)
         x = self.aggregation(x)
