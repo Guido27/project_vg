@@ -8,7 +8,7 @@ class NetVLAD(nn.Module):
     def __init__(self,
                  num_clusters,
                  dim,
-                 alpha=10.0):
+                 alpha=1.0):
         """
         Args:
             num_clusters : int
