@@ -6,8 +6,8 @@ import torch.nn.functional as F
 class NetVLAD(nn.Module):
     """NetVLAD layer implementation"""
     def __init__(self,
-                 num_clusters=64,
-                 dim=128,
+                 num_clusters,
+                 dim,
                  alpha=10.0):
         """
         Args:
