@@ -40,17 +40,9 @@ logging.info(f"Val set: {val_ds}")
 test_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "test")
 logging.info(f"Test set: {test_ds}")
 
-# TO-DO: improve this
-netvlad = True
-num_clusters = 32
-
 #### Initialize model
-model = network.GeoLocalizationNet(args, use_netvlad=netvlad, num_clusters=num_clusters)
+model = network.GeoLocalizationNet(args)
 model = model.to(args.device)
-
-# TO-DO: change this
-if netvlad:
-    args.features_dim *= num_clusters
 
 #### Setup Optimizer and Loss
 optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
