@@ -4,7 +4,7 @@ import logging
 import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
-import netvlad
+import netvlad as nv
 
 
 class GeoLocalizationNet(nn.Module):
@@ -16,7 +16,7 @@ class GeoLocalizationNet(nn.Module):
         super().__init__()
         self.backbone = get_backbone(args)
         if args.netvlad_clusters is not None:
-            self.aggregation = netvlad.NetVLAD(dim=args.features_dim, num_clusters=args.netvlad_clusters)
+            self.aggregation = nv.NetVLAD(dim=args.features_dim, num_clusters=args.netvlad_clusters)
             args.features_dim *= args.netvlad_clusters
         else:
             self.aggregation = nn.Sequential(L2Norm(),
