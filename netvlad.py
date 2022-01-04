@@ -8,8 +8,7 @@ class NetVLAD(nn.Module):
     def __init__(self,
                  num_clusters=64,
                  dim=128,
-                 alpha=100.0,
-                 normalize_input=True):
+                 alpha=100.0):
         """
         Args:
             num_clusters : int
@@ -18,14 +17,11 @@ class NetVLAD(nn.Module):
                 Dimension of descriptors
             alpha : float
                 Parameter of initialization. Larger value is harder assignment.
-            normalize_input : bool
-                If true, descriptor-wise L2 normalization is applied to input.
         """
         super(NetVLAD, self).__init__()
         self.num_clusters = num_clusters
         self.dim = dim
         self.alpha = alpha
-        self.normalize_input = normalize_input
         self.conv = nn.Conv2d(dim, num_clusters, kernel_size=(1, 1), bias=True)
         self.centroids = nn.Parameter(torch.rand(num_clusters, dim))
         self._init_params()
@@ -37,9 +33,6 @@ class NetVLAD(nn.Module):
 
     def forward(self, x):
         N, C = x.shape[:2]
-
-        if self.normalize_input:
-            x = F.normalize(x, p=2, dim=1)  # across descriptor dim
 
         # soft-assignment
         soft_assign = self.conv(x).view(N, self.num_clusters, -1)

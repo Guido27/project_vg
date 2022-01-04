@@ -16,7 +16,8 @@ class GeoLocalizationNet(nn.Module):
         super().__init__()
         self.backbone = get_backbone(args)
         if args.netvlad_clusters is not None:
-            self.aggregation = nv.NetVLAD(dim=args.features_dim, num_clusters=args.netvlad_clusters)
+            self.aggregation = nn.Sequential(L2Norm(),
+                                        nv.NetVLAD(dim=args.features_dim, num_clusters=args.netvlad_clusters))
             args.features_dim *= args.netvlad_clusters
         else:
             self.aggregation = nn.Sequential(L2Norm(),
