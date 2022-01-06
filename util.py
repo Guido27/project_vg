@@ -8,7 +8,3 @@ def save_checkpoint(args, state, is_best, filename):
     torch.save(state, model_path)
     if is_best:
         shutil.copyfile(model_path, join(args.output_folder, "best_model.pth"))
-
-
-def load_checkpoint(filename):
-    return torch.load(filename)

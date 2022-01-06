@@ -58,10 +58,9 @@ for epoch_num in range(args.epochs_num):
 
     # Resume model
     if args.resume_model is not None:
-        checkpoint = util.load_checkpoint(args.resume_model)
+        checkpoint = torch.load(args.resume_model)
         epoch_num = checkpoint['epoch_num']
         model.load_state_dict(checkpoint['model_state_dict'])
-        logging.info(f"Successfully loaded model")
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])     
         recalls = checkpoint['recalls']
         best_r5 = checkpoint['best_r5']
