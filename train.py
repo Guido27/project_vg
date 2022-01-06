@@ -54,10 +54,14 @@ logging.info(f"Test set: {test_ds}")
 
 #### Initialize model
 model = network.GeoLocalizationNet(args)
-model = model.to(args.device)
+if args.resume_model is None:
+    model = model.to(args.device)
 
 #### Setup Optimizer and Loss
-optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+if args.optim == "sgd":
+    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr)
+else:   # adam
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 criterion_triplet = nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
 
 best_r5 = 0
