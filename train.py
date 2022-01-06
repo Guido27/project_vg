@@ -66,10 +66,10 @@ for epoch_num in range(args.epochs_num):
         best_r5 = checkpoint['best_r5']
         not_improved_num = checkpoint['not_improved_num']
         args.resume_model = None
-        if epoch_num > args.epochs_num:
+        if epoch_num >= args.epochs_num:
             logging.info(f"The loaded model was already trained for {args.epoch_num} epochs. Stop training.")
             break
-        if not_improved_num > args.patience:
+        if not_improved_num >= args.patience:
             logging.info(f"Performance of the loaded model did not improve for {not_improved_num} epochs. Stop training.")
             break
 
