@@ -48,6 +48,8 @@ if args.resume_model is None:
 #### Setup Optimizer and Loss
 if args.optim == "sgd":
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr)
+elif args.optim =="sgdwithmomentum":
+    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum = 0.9)
 else:   # adam
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 criterion_triplet = nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
