@@ -61,11 +61,16 @@ for epoch_num in range(args.epochs_num):
         checkpoint = util.load_checkpoint(args.resume_model)
         epoch_num = checkpoint['epoch_num']
         model.load_state_dict(checkpoint['model_state_dict'])
-        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        logging.info(f"Successfully loaded model")
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])     
         recalls = checkpoint['recalls']
         best_r5 = checkpoint['best_r5']
         not_improved_num = checkpoint['not_improved_num']
         args.resume_model = None
+
+        logging.info(f"Successfully loaded model [epoch_num: {epoch_num}, recalls: {recalls}, \
+                    best_r5: {best_r5}, not_improved_num: {not_improved_num}]")
+
         if epoch_num >= args.epochs_num:
             logging.info(f"The loaded model was already trained for {args.epoch_num} epochs. Stop training.")
             break
