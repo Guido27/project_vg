@@ -22,6 +22,16 @@ import sys
 
 #### Initial setup: parser, logging...
 args = parser.parse_arguments()
+
+# Basic validation
+if args.mode != "netvlad":
+    if args.num_clusters is not None:
+        logging.info(f"The selected mode doesn't accept the num_clusters parameter")
+        sys.exit()
+    if args.alpha is not None:
+        logging.info(f"The selected mode doesn't accept the alpha parameter")
+        sys.exit()
+
 start_time = datetime.now()
 args.output_folder = join("runs", args.exp_name, start_time.strftime('%Y-%m-%d_%H-%M-%S'))
 commons.setup_logging(args.output_folder)
@@ -43,15 +53,6 @@ test_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "test"
 logging.info(f"Test set: {test_ds}")
 
 #### Initialize model
-
-# Basic validation
-if args.mode != "netvlad" and args.netvlad_clusters is not None:
-    logging.info(f"netvlad_clusters param was set, but the selected mode was not netvlad")
-    sys.exit()
-elif args.mode == "netvlad" and args.netvlad_clusters is None:
-    logging.info(f"selected mode was netvlad, but no number of clusters was specified")
-    sys.exit()
-
 model = network.GeoLocalizationNet(args)
 model = model.to(args.device)
 

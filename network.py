@@ -17,8 +17,8 @@ class GeoLocalizationNet(nn.Module):
         self.backbone = get_backbone(args)
         if args.mode == "netvlad":
             self.aggregation = nn.Sequential(L2Norm(),
-                                        nv.NetVLAD(dim=args.features_dim, num_clusters=args.netvlad_clusters))
-            args.features_dim *= args.netvlad_clusters
+                                        nv.NetVLAD(dim=args.features_dim, num_clusters=args.num_clusters, alpha=args.alpha))
+            args.features_dim *= args.num_clusters
         elif args.mode == "gem":
             self.aggregation = nn.Sequential(L2Norm(),
                                         pooling.GeM(),
