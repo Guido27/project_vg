@@ -18,20 +18,8 @@ import commons
 import network
 import datasets_ws
 
-import sys
-
 #### Initial setup: parser, logging...
 args = parser.parse_arguments()
-
-# Basic validation
-if args.mode != "netvlad":
-    if args.num_clusters is not None:
-        logging.info(f"The selected mode doesn't accept the num_clusters parameter")
-        sys.exit()
-    if args.alpha is not None:
-        logging.info(f"The selected mode doesn't accept the alpha parameter")
-        sys.exit()
-
 start_time = datetime.now()
 args.output_folder = join("runs", args.exp_name, start_time.strftime('%Y-%m-%d_%H-%M-%S'))
 commons.setup_logging(args.output_folder)
