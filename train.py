@@ -68,8 +68,7 @@ for epoch_num in range(args.epochs_num):
         not_improved_num = checkpoint['not_improved_num']
         args.resume_model = None
 
-        logging.info(f"Successfully loaded model [epoch_num: {epoch_num}, recalls: {recalls}, \
-                    best_r5: {best_r5}, not_improved_num: {not_improved_num}]")
+        logging.info(f"Successfully loaded model (epoch_num: {epoch_num}, recalls: {recalls}, best_r5: {best_r5}, not_improved_num: {not_improved_num})")
 
         if epoch_num >= args.epochs_num:
             logging.info(f"The loaded model was already trained for {args.epoch_num} epochs. Stop training.")
