@@ -75,22 +75,22 @@ for epoch_num in range(args.epochs_num):
     # Resume model
     if args.resume_model is not None:
         checkpoint = torch.load(args.resume_model)
-        epoch_num = checkpoint['epoch_num'] + 1
+        epoch_num = checkpoint['epoch_num']
         model.load_state_dict(checkpoint['model_state_dict'])
+        model = model.to(args.device)
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])     
         recalls = checkpoint['recalls']
         best_r5 = checkpoint['best_r5']
         not_improved_num = checkpoint['not_improved_num']
-        args.resume_model = None
-
         logging.info(f"Successfully loaded model (epoch_num: {epoch_num}, recalls: {recalls}, best_r5: {best_r5}, not_improved_num: {not_improved_num})")
-
         if epoch_num >= args.epochs_num:
             logging.info(f"The loaded model was already trained for {args.epoch_num} epochs. Stop training.")
             break
         if not_improved_num >= args.patience:
             logging.info(f"Performance of the loaded model did not improve for {not_improved_num} epochs. Stop training.")
             break
+        args.resume_model = None
+        epoch_num += 1
 
     logging.info(f"Start training epoch: {epoch_num:02d}")
     
