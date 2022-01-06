@@ -55,6 +55,19 @@ logging.info(f"Output dimension of the model is {args.features_dim}")
 
 #### Training loop
 for epoch_num in range(args.epochs_num):
+
+    # Resume model
+    if args.resume_model is not None:
+        checkpoint = util.load_checkpoint(args.resume_model)
+        epoch_num = checkpoint['epoch_num']
+        if epoch_num > args.epoch_num: break
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        recalls = checkpoint['recalls']
+        best_r5 = checkpoint['best_r5']
+        not_improved_num = checkpoint['not_improved_num']
+        args.resume_model = None
+
     logging.info(f"Start training epoch: {epoch_num:02d}")
     
     epoch_start_time = datetime.now()
