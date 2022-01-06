@@ -5,7 +5,7 @@ import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
 import netvlad as nv
-
+import pooling
 
 class GeoLocalizationNet(nn.Module):
     """The model is composed of a backbone and an aggregation layer.
@@ -15,10 +15,14 @@ class GeoLocalizationNet(nn.Module):
     def __init__(self, args):
         super().__init__()
         self.backbone = get_backbone(args)
-        if args.netvlad_clusters is not None:
+        if args.mode == "netvlad":
             self.aggregation = nn.Sequential(L2Norm(),
                                         nv.NetVLAD(dim=args.features_dim, num_clusters=args.netvlad_clusters))
             args.features_dim *= args.netvlad_clusters
+        elif args.mode == "gem":
+            self.aggregation = nn.Sequential(L2Norm(),
+                                        pooling.GeM(),
+                                        Flatten())
         else:
             self.aggregation = nn.Sequential(L2Norm(),
                                         torch.nn.AdaptiveAvgPool2d(1),

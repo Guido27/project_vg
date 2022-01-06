@@ -24,6 +24,7 @@ def parse_arguments():
                         help="How many negatives to consider per each query in the loss")
     parser.add_argument("--neg_samples_num", type=int, default=1000,
                         help="How many negatives to use to compute the hardest ones")
+    parser.add_argument('--mode', type=str, default='avg_pool', help='Mode', choices=['avg_pool', 'netvlad', 'gem'])
     parser.add_argument("--netvlad_clusters", type=int,
                         help="How many clusters to use for NetVlad")
     # Other parameters

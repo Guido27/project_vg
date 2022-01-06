@@ -18,6 +18,8 @@ import commons
 import network
 import datasets_ws
 
+import sys
+
 #### Initial setup: parser, logging...
 args = parser.parse_arguments()
 start_time = datetime.now()
@@ -41,6 +43,15 @@ test_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "test"
 logging.info(f"Test set: {test_ds}")
 
 #### Initialize model
+
+# Basic validation
+if args.mode != "netvlad" and args.netvlad_clusters is not None:
+    logging.info(f"netvlad_clusters param was set, but the selected mode was not netvlad")
+    sys.exit()
+elif args.mode == "netvlad" and args.netvlad_clusters is None:
+    logging.info(f"selected mode was netvlad, but no number of clusters was specified")
+    sys.exit()
+
 model = network.GeoLocalizationNet(args)
 model = model.to(args.device)
 
