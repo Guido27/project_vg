@@ -70,7 +70,7 @@ for epoch_num in range(args.epochs_num):
     # Resume model
     if args.resume_model is not None:
         checkpoint = torch.load(args.resume_model)
-        epoch_num = checkpoint['epoch_num']
+        epoch_num = checkpoint['epoch_num'] + 1
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])     
         recalls = checkpoint['recalls']
