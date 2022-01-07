@@ -64,21 +64,8 @@ for epoch_num in range(args.epochs_num):
 
     # Resume model
     if args.resume_model is not None:
-        checkpoint = torch.load(args.resume_model)
-        epoch_num = checkpoint['epoch_num']
-        model.load_state_dict(checkpoint['model_state_dict'])
-        model = model.to(args.device)
-        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])     
-        recalls = checkpoint['recalls']
-        best_r5 = checkpoint['best_r5']
-        not_improved_num = checkpoint['not_improved_num']
-        logging.info(f"Successfully loaded model (epoch_num: {epoch_num}, recalls: {recalls}, best_r5: {best_r5}, not_improved_num: {not_improved_num})")
-        if epoch_num >= args.epochs_num:
-            logging.info(f"The loaded model was already trained for {args.epoch_num} epochs. Stop training.")
-            break
-        if not_improved_num >= args.patience:
-            logging.info(f"Performance of the loaded model did not improve for {not_improved_num} epochs. Stop training.")
-            break
+        epoch_num, recalls = util.recover_from_state(args.resume_model, model, optimizer)
+        logging.info(f"Successfully loaded model (epoch: {epoch_num}, recalls: {recalls}")
         args.resume_model = None
         epoch_num += 1
 
@@ -146,10 +133,8 @@ for epoch_num in range(args.epochs_num):
     is_best = recalls[1] > best_r5
     
     # Save checkpoint, which contains all training parameters
-    util.save_checkpoint(args, {"epoch_num": epoch_num, "model_state_dict": model.state_dict(),
-        "optimizer_state_dict": optimizer.state_dict(), "recalls": recalls, "best_r5": best_r5,
-        "not_improved_num": not_improved_num
-    }, is_best, filename="last_model.pth")
+    state = util.make_state(epoch_num, model, optimizer, recalls, best_r5, not_improved_num)
+    util.save_checkpoint(args, state, is_best, filename="last_model.pth")
     
     # If recall@5 did not improve for "many" epochs, stop training
     if is_best:
