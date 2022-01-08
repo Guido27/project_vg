@@ -57,7 +57,6 @@ if args.resume_model is None:
     epoch_num = 0
     best_r5 = 0
     not_improved_num = 0
-# Resume model
 else:
     epoch_num, recalls, best_r5 = util.recover_from_state(args.resume_model, model, optimizer)
     logging.info(f"Successfully loaded model (epoch: {epoch_num}, recalls: {recalls})")
