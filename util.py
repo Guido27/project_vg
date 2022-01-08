@@ -12,8 +12,9 @@ def save_checkpoint(args, state, is_best, filename):
         shutil.copyfile(model_path, os.path.join(args.output_folder, "best_model.pth"))
 
 
-def make_state(epoch_num, model, optimizer, recalls, best_r5, not_improved_num):
+def make_state(args, epoch_num, model, optimizer, recalls, best_r5, not_improved_num):
     return {
+        "args": args,
         "epoch_num": epoch_num,
         "model_state_dict": model.state_dict(),
         "optimizer_state_dict": optimizer.state_dict(),
@@ -33,25 +34,22 @@ def load_state(state_path):
     return None
 
 
-def recover_model_state(model, state):
+def resume_from_state(state, model, optimizer, args, resume_random=True):
     model.load_state_dict(state["model_state_dict"])
-
-
-def recover_optim_state(optimizer, state):
     optimizer.load_state_dict(state["optimizer_state_dict"])
-
-
-def recover_random_state(state):
-    # For total reproducibility, restore the random generators states
-    random.setstate(state["random_state"])
-    np.random.set_state(state["numpy_random_state"])
-    torch.set_rng_state(state["torch_random_state"])
-    torch.cuda.set_rng_state(state["torch_cuda_random_state"])  # TO-DO: check if needed
-
-
-def recover_params_from_state(state):  
     epoch_num = state["epoch_num"]
     recalls = state["recalls"]
     best_r5 = state["best_r5"]
     not_improved_num = state["not_improved_num"]
+    # For total reproducibility, restore the random generators states
+    if resume_random:
+        random.setstate(state["random_state"])
+        np.random.set_state(state["numpy_random_state"])
+        torch.set_rng_state(state["torch_random_state"])
+        torch.cuda.set_rng_state(state["torch_cuda_random_state"])  # TO-DO: check if needed
+    exp_name = args.exp_name
+    datasets_folder = args.datasets_folder
+    args = state["args"]
+    args.exp_name = exp_name
+    args.datasets_folder = datasets_folder
     return epoch_num, recalls, best_r5, not_improved_num

@@ -40,19 +40,9 @@ logging.info(f"Val set: {val_ds}")
 test_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "test")
 logging.info(f"Test set: {test_ds}")
 
-if args.resume_model is not None:
-    state = util.load_state(args.resume_model)
-    if state is None:
-        logging.error(f"No checkpoint named '{args.resume_model}' found, training from scratch...")
-        args.resume_model = None
-    else:
-        logging.info(f"Found checkpoint '{args.resume_model}'")
-
 #### Initialize model
 model = network.GeoLocalizationNet(args)
 model = model.to(args.device)
-if args.resume_model is not None:
-    util.recover_model_state(model, state)
 
 #### Setup Optimizer and Loss
 if args.optim == "sgd":
@@ -61,22 +51,24 @@ elif args.optim =="sgdwithmomentum":
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum = 0.9)
 else:   # adam
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-if args.resume_model is not None:
-    util.recover_optim_state(optimizer, state)
 criterion_triplet = nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
 
-if args.resume_model is not None:
-    util.recover_random_state(state)
-    epoch_num, recalls, best_r5, not_improved_num = util.recover_params_from_state(state)
-    if recalls[1] > best_r5:
-        best_r5 = recalls[1]
-    logging.info(f"Successfully loaded model (epoch: {epoch_num}, recalls: {recalls})")
-    del state
-    del recalls
-else:
+if args.resume_model is None:
+    epoch_num = 0
     best_r5 = 0
     not_improved_num = 0
-    epoch_num = 0
+else:
+    state = util.load_state(args.resume_model)
+    if state is None:
+        logging.error(f"No checkpoint named '{args.resume_model}' found, training from scratch...")
+    else:
+        logging.info(f"Found checkpoint '{args.resume_model}'")
+        epoch_num, recalls, best_r5, not_improved_num = util.resume_from_state(state, model, optimizer, args)
+        logging.info(f"Successfully loaded model (epoch: {epoch_num}, recalls: {recalls})")
+        if recalls[1] > best_r5:
+            best_r5 = recalls[1]
+    del state
+
 
 logging.info(f"Output dimension of the model is {args.features_dim}")
 
@@ -149,7 +141,7 @@ while epoch_num < args.epochs_num:
     is_best = recalls[1] > best_r5
     
     # Save checkpoint, which contains all training parameters
-    state = util.make_state(epoch_num, model, optimizer, recalls, best_r5, not_improved_num)
+    state = util.make_state(args, epoch_num, model, optimizer, recalls, best_r5, not_improved_num)
     util.save_checkpoint(args, state, is_best, filename="last_model.pth")
     
     # If recall@5 did not improve for "many" epochs, stop training
