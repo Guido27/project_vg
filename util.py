@@ -11,6 +11,7 @@ def save_checkpoint(args, state, is_best, filename):
     if is_best:
         shutil.copyfile(model_path, join(args.output_folder, "best_model.pth"))
 
+
 def make_state(epoch_num, model, optimizer, recalls, best_r5, not_improved_num):
     return {
         "epoch_num": epoch_num,
@@ -19,12 +20,14 @@ def make_state(epoch_num, model, optimizer, recalls, best_r5, not_improved_num):
         "recalls": recalls,
         "best_r5": best_r5,
         "not_improved_num": not_improved_num,
-        "torch_state": torch.get_rng_state(),
-        "torch_random_state": torch.random.get_rng_state(),
-        "torch_cuda_random_state": torch.cuda.get_rng_state(),
+        "random_state": random.getstate(),
         "numpy_random_state" : np.random.get_state(),
-        "random_state": random.getstate()
+        "torch_state": torch.get_rng_state(),
+        # TO-DO: check if needed
+        "torch_random_state": torch.random.get_rng_state(),
+        "torch_cuda_random_state": torch.cuda.get_rng_state()
     }
+
 
 def recover_from_state(checkpoint, model, optimizer):
     state = torch.load(checkpoint)
@@ -32,7 +35,7 @@ def recover_from_state(checkpoint, model, optimizer):
     optimizer.load_state_dict(state["optimizer_state_dict"])
     epoch_num = state["epoch_num"]
     recalls = state["recalls"]
-    torch.set_rng_state(state["torch_state"])
+    random.setstate(state["random_state"])
     np.random.set_state(state["numpy_random_state"])
-    random.set_state(state["random_state"])
+    torch.set_rng_state(state["torch_state"])
     return epoch_num, recalls

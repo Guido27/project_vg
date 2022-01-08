@@ -42,8 +42,7 @@ logging.info(f"Test set: {test_ds}")
 
 #### Initialize model
 model = network.GeoLocalizationNet(args)
-if args.resume_model is None:
-    model = model.to(args.device)
+model = model.to(args.device)
 
 #### Setup Optimizer and Loss
 if args.optim == "sgd":
@@ -65,7 +64,7 @@ for epoch_num in range(args.epochs_num):
     # Resume model
     if args.resume_model is not None:
         epoch_num, recalls = util.recover_from_state(args.resume_model, model, optimizer)
-        logging.info(f"Successfully loaded model (epoch: {epoch_num}, recalls: {recalls}")
+        logging.info(f"Successfully loaded model (epoch: {epoch_num}, recalls: {recalls})")
         args.resume_model = None
         epoch_num += 1
 
