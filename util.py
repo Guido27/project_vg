@@ -22,9 +22,8 @@ def make_state(epoch_num, model, optimizer, recalls, best_r5, not_improved_num):
         "not_improved_num": not_improved_num,
         "random_state": random.getstate(),
         "numpy_random_state" : np.random.get_state(),
-        "torch_state": torch.get_rng_state(),
+        "torch_random_state": torch.get_rng_state(),
         # TO-DO: check if needed
-        "torch_random_state": torch.random.get_rng_state(),
         "torch_cuda_random_state": torch.cuda.get_rng_state()
     }
 
@@ -40,5 +39,5 @@ def recover_from_state(checkpoint_name, model, optimizer, resume_random=True):
     if resume_random:
         random.setstate(state["random_state"])
         np.random.set_state(state["numpy_random_state"])
-        torch.set_rng_state(state["torch_state"])
+        torch.set_rng_state(state["torch_random_state"])
     return epoch_num, recalls, best_r5

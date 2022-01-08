@@ -55,18 +55,21 @@ criterion_triplet = nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum
 
 best_r5 = 0
 not_improved_num = 0
+epoch_num = 0
 
 logging.info(f"Output dimension of the model is {args.features_dim}")
 
-#### Training loop
-for epoch_num in range(args.epochs_num):
+# Resume model
+if args.resume_model is not None:
+    epoch_num, recalls, best_r5 = util.recover_from_state(args.resume_model, model, optimizer)
+    if recalls[1] > best_r5:
+        best_r5 = recalls[1]
+    logging.info(f"Successfully loaded model (epoch: {epoch_num}, recalls: {recalls})")
 
-    # Resume model
-    if args.resume_model is not None:
-        epoch_num, recalls, best_r5 = util.recover_from_state(args.resume_model, model, optimizer)
-        logging.info(f"Successfully loaded model (epoch: {epoch_num}, recalls: {recalls})")
-        args.resume_model = None
-        epoch_num += 1
+#### Training loop
+while epoch_num < args.epochs_num:
+
+    epoch_num += 1 # count from 1
 
     logging.info(f"Start training epoch: {epoch_num:02d}")
     
@@ -76,7 +79,7 @@ for epoch_num in range(args.epochs_num):
     # How many loops should an epoch last (default is 5000/1000=5)
     loops_num = math.ceil(args.queries_per_epoch / args.cache_refresh_rate)
     for loop_num in range(loops_num):
-        logging.debug(f"Cache: {loop_num} / {loops_num}")
+        logging.debug(f"Cache: {loop_num + 1} / {loops_num}")
         
         # Compute triplets to use in the triplet loss
         triplets_ds.is_inference = True
