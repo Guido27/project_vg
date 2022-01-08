@@ -41,7 +41,7 @@ test_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "test"
 logging.info(f"Test set: {test_ds}")
 
 if args.resume_model is not None:
-    state = torch.load(args.resume_model)
+    state = util.load_state(args.resume_model)
     if state is None:
         logging.error(f"No checkpoint named {args.resume_model} found, training from scratch...")
         args.resume_model = None
