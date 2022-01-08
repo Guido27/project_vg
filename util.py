@@ -29,15 +29,16 @@ def make_state(epoch_num, model, optimizer, recalls, best_r5, not_improved_num):
     }
 
 
-def recover_from_state(checkpoint, model, optimizer):
-    state = torch.load(checkpoint)
+def recover_from_state(checkpoint_name, model, optimizer, resume_random=True):
+    state = torch.load(checkpoint_name)
     model.load_state_dict(state["model_state_dict"])
     optimizer.load_state_dict(state["optimizer_state_dict"])
     epoch_num = state["epoch_num"]
     recalls = state["recalls"]
     best_r5 = state["best_r5"]
     # For total reproducibility, restore the random generators states
-    random.setstate(state["random_state"])
-    np.random.set_state(state["numpy_random_state"])
-    torch.set_rng_state(state["torch_state"])
+    if resume_random:
+        random.setstate(state["random_state"])
+        np.random.set_state(state["numpy_random_state"])
+        torch.set_rng_state(state["torch_state"])
     return epoch_num, recalls, best_r5
