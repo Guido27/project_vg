@@ -43,8 +43,10 @@ logging.info(f"Test set: {test_ds}")
 if args.resume_model is not None:
     state = util.load_state(args.resume_model)
     if state is None:
-        logging.error(f"No checkpoint named {args.resume_model} found, training from scratch...")
+        logging.error(f"No checkpoint named '{args.resume_model}' found, training from scratch...")
         args.resume_model = None
+    else:
+        logging.info(f"Found checkpoint '{args.resume_model}'")
 
 #### Initialize model
 model = network.GeoLocalizationNet(args)
