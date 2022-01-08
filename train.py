@@ -20,6 +20,14 @@ import datasets_ws
 
 #### Initial setup: parser, logging...
 args = parser.parse_arguments()
+if args.resume_model is not None:
+    state = util.load_state(args.resume_model)
+    if state is None:
+        logging.error(f"No checkpoint named '{args.resume_model}' found, training from scratch...")
+    else:
+        logging.info(f"Found checkpoint '{args.resume_model}'")
+        util.load_args_from_state(state, args)
+        logging.info(f"Checkpoint args loaded")
 start_time = datetime.now()
 args.output_folder = join("runs", args.exp_name, start_time.strftime('%Y-%m-%d_%H-%M-%S'))
 commons.setup_logging(args.output_folder)
@@ -58,15 +66,10 @@ if args.resume_model is None:
     best_r5 = 0
     not_improved_num = 0
 else:
-    state = util.load_state(args.resume_model)
-    if state is None:
-        logging.error(f"No checkpoint named '{args.resume_model}' found, training from scratch...")
-    else:
-        logging.info(f"Found checkpoint '{args.resume_model}'")
-        epoch_num, recalls, best_r5, not_improved_num = util.resume_from_state(state, model, optimizer, args)
-        logging.info(f"Successfully loaded model (epoch: {epoch_num}, recalls: {recalls})")
-        if recalls[1] > best_r5:
-            best_r5 = recalls[1]
+    epoch_num, recalls, best_r5, not_improved_num = util.resume_from_state(state, model, optimizer, args)
+    logging.info(f"Successfully loaded model (epoch: {epoch_num}, recalls: {recalls})")
+    if recalls[1] > best_r5:
+        best_r5 = recalls[1]
     del state
 
 
