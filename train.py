@@ -63,7 +63,7 @@ for epoch_num in range(args.epochs_num):
 
     # Resume model
     if args.resume_model is not None:
-        epoch_num, recalls = util.recover_from_state(args.resume_model, model, optimizer)
+        epoch_num, recalls, best_r5 = util.recover_from_state(args.resume_model, model, optimizer)
         logging.info(f"Successfully loaded model (epoch: {epoch_num}, recalls: {recalls})")
         args.resume_model = None
         epoch_num += 1

@@ -35,7 +35,8 @@ def recover_from_state(checkpoint, model, optimizer):
     optimizer.load_state_dict(state["optimizer_state_dict"])
     epoch_num = state["epoch_num"]
     recalls = state["recalls"]
+    best_r5 = state["best_r5"]
     random.setstate(state["random_state"])
     np.random.set_state(state["numpy_random_state"])
     torch.set_rng_state(state["torch_state"])
-    return epoch_num, recalls
+    return epoch_num, recalls, best_r5
