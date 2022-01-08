@@ -65,7 +65,7 @@ else:
 logging.info(f"Output dimension of the model is {args.features_dim}")
 
 #### Training loop
-for epoch_num in range(args.epochs_num):
+while epoch_num < args.epochs_num:
 
     epoch_num += 1
 
