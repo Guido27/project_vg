@@ -135,7 +135,7 @@ while epoch_num < args.epochs_num:
             epoch_losses = np.append(epoch_losses, batch_loss)
             del loss_triplet
         
-        logging.debug(f"Epoch[{epoch_num:02d}]({loop_num}/{loops_num}): " +
+        logging.debug(f"Epoch[{epoch_num:02d}]({loop_num + 1}/{loops_num}): " +
                       f"current batch triplet loss = {batch_loss:.4f}, " +
                       f"average epoch triplet loss = {epoch_losses.mean():.4f}")
     
