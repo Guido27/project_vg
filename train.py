@@ -40,9 +40,17 @@ logging.info(f"Val set: {val_ds}")
 test_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "test")
 logging.info(f"Test set: {test_ds}")
 
+if args.resume_model is not None:
+    state = torch.load(args.resume_model)
+    if state is None:
+        logging.error(f"No checkpoint named {args.resume_model} found, training from scratch...")
+        args.resume_model = None
+
 #### Initialize model
 model = network.GeoLocalizationNet(args)
 model = model.to(args.device)
+if args.resume_model is not None:
+    util.recover_model_state(model, state)
 
 #### Setup Optimizer and Loss
 if args.optim == "sgd":
@@ -51,20 +59,24 @@ elif args.optim =="sgdwithmomentum":
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum = 0.9)
 else:   # adam
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+if args.resume_model is not None:
+    util.recover_optim_state(optimizer, state)
 criterion_triplet = nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
 
-best_r5 = 0
-not_improved_num = 0
-epoch_num = 0
-
-logging.info(f"Output dimension of the model is {args.features_dim}")
-
-# Resume model
 if args.resume_model is not None:
-    epoch_num, recalls, best_r5 = util.recover_from_state(args.resume_model, model, optimizer)
+    util.recover_random_state(state)
+    epoch_num, recalls, best_r5, not_improved_num = util.recover_params_from_state(state)
     if recalls[1] > best_r5:
         best_r5 = recalls[1]
     logging.info(f"Successfully loaded model (epoch: {epoch_num}, recalls: {recalls})")
+    del state
+    del recalls
+else:
+    best_r5 = 0
+    not_improved_num = 0
+    epoch_num = 0
+
+logging.info(f"Output dimension of the model is {args.features_dim}")
 
 #### Training loop
 while epoch_num < args.epochs_num:
