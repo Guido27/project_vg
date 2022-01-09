@@ -20,21 +20,22 @@ import datasets_ws
 
 #### Initial setup: parser, logging...
 args = parser.parse_arguments()
-if args.resume_model is None:
+if args.resume is None:
     checkpoint = None
 else:
-    checkpoint = util.load_state(args.resume_model)
+    checkpoint = util.load_state(args.resume)
     old_args = args
     args = util.load_args_from_state(checkpoint)
     args.exp_name = old_args.exp_name
     args.datasets_folder = old_args.datasets_folder
+    args.resume = old_arg.resume
     del old_args
 start_time = datetime.now()
 args.output_folder = join("runs", args.exp_name, start_time.strftime('%Y-%m-%d_%H-%M-%S'))
 commons.setup_logging(args.output_folder)
 commons.make_deterministic(args.seed)
 if checkpoint is not None:
-    logging.info(f"Arguments loaded from checkpoint")
+    logging.info(f"Arguments loaded from checkpoint '{args.resume}'")
 logging.info(f"Arguments: {args}")
 logging.info(f"The outputs are being saved in {args.output_folder}")
 logging.info(f"Using {torch.cuda.device_count()} GPUs and {multiprocessing.cpu_count()} CPUs")
