@@ -24,12 +24,12 @@ if args.resume is None:
     checkpoint = None
 else:
     checkpoint = util.load_state(args.resume)
-    old_args = args
+    parsed_args = args
     args = util.load_args_from_state(checkpoint)
-    args.exp_name = old_args.exp_name
-    args.datasets_folder = old_args.datasets_folder
-    args.resume = old_arg.resume
-    del old_args
+    args.exp_name = parsed_args.exp_name
+    args.datasets_folder = parsed_args.datasets_folder
+    args.resume = parsed_args.resume
+    del parsed_args
 start_time = datetime.now()
 args.output_folder = join("runs", args.exp_name, start_time.strftime('%Y-%m-%d_%H-%M-%S'))
 commons.setup_logging(args.output_folder)
@@ -65,16 +65,16 @@ else:   # adam
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 criterion_triplet = nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
 
-# Eventual model resuming
+#### Eventual model resuming
 if checkpoint is None:
     epoch_num = 0
     best_r5 = 0
     not_improved_num = 0
 else:
     epoch_num, recalls, best_r5, not_improved_num = util.resume_from_state(checkpoint, model, optimizer)
-    logging.info(f"Successfully loaded model from checkpoint (epoch: {epoch_num}, recalls: {recalls})")
     if recalls[1] > best_r5:
         best_r5 = recalls[1]
+    logging.info(f"Successfully loaded model from checkpoint (epoch: {epoch_num}, recalls: {recalls})")
 del checkpoint
 
 
