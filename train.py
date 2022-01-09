@@ -20,10 +20,15 @@ import datasets_ws
 
 #### Initial setup: parser, logging...
 args = parser.parse_arguments()
-if args.resume_model is not None:
-    state = util.load_state(args.resume_model)
-    if state is not None:
-        args = util.load_args_from_state(state, args)
+if args.resume_model is None:
+    checkpoint = None
+else:
+    checkpoint = util.load_state(args.resume_model)
+    old_args = args
+    args = util.load_args_from_state(checkpoint)
+    args.exp_name = old_args.exp_name
+    args.datasets_folder = old_args.datasets_folder
+    del old_args
 start_time = datetime.now()
 args.output_folder = join("runs", args.exp_name, start_time.strftime('%Y-%m-%d_%H-%M-%S'))
 commons.setup_logging(args.output_folder)
@@ -58,20 +63,17 @@ else:   # adam
 criterion_triplet = nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
 
 # Eventual model resuming
-if args.resume_model is None:
+if checkpoint is None:
     epoch_num = 0
     best_r5 = 0
     not_improved_num = 0
 else:
-    if state is None:
-        logging.error(f"No checkpoint named '{args.resume_model}' found, training from scratch...")
-    else:
-        logging.info(f"Found checkpoint '{args.resume_model}'")
-        epoch_num, recalls, best_r5, not_improved_num = util.resume_from_state(state, model, optimizer)
-        logging.info(f"Successfully loaded model (epoch: {epoch_num}, recalls: {recalls})")
-        if recalls[1] > best_r5:
-            best_r5 = recalls[1]
-    del state
+    logging.info(f"Found checkpoint '{args.resume_model}'")
+    epoch_num, recalls, best_r5, not_improved_num = util.resume_from_state(checkpoint, model, optimizer)
+    logging.info(f"Successfully loaded model (epoch: {epoch_num}, recalls: {recalls})")
+    if recalls[1] > best_r5:
+        best_r5 = recalls[1]
+del checkpoint
 
 
 logging.info(f"Output dimension of the model is {args.features_dim}")

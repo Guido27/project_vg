@@ -29,24 +29,13 @@ def make_state(args, epoch_num, model, optimizer, recalls, best_r5, not_improved
 
 
 def load_state(state_path):
-    if os.path.isfile(state_path):
-        return torch.load(state_path)
-    return None
+    if not os.path.isfile(state_path):
+        raise FileNotFoundError(f"Checkpoint '{state_path}' does not exist")
+    return torch.load(state_path)
 
 
-def load_args_from_state(state, args):
-    '''
-    Resume the ars from the state, preserving:
-    exp_name, datasets_folder and resume_model params
-    '''
-    exp_name = args.exp_name
-    datasets_folder = args.datasets_folder
-    resume_model = args.resume_model
-    args = state["args"]
-    args.exp_name = exp_name
-    args.datasets_folder = datasets_folder
-    args.resume_model = resume_model
-    return args
+def load_args_from_state(state):
+    return state["args"]
 
 
 def resume_from_state(state, model, optimizer, resume_random=True):
