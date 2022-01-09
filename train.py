@@ -28,6 +28,8 @@ else:
     args = util.load_args_from_state(checkpoint)
     args.exp_name = parsed_args.exp_name
     args.datasets_folder = parsed_args.datasets_folder
+    args.epochs_num = parsed_args.epochs_num
+    args.patience = parsed_args.patience
     args.resume = parsed_args.resume
     del parsed_args
 start_time = datetime.now()
