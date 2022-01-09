@@ -35,6 +35,10 @@ def load_state(state_path):
 
 
 def load_args_from_state(state, args):
+    '''
+    Resume the ars from the state, preserving:
+    exp_name, datasets_folder and resume_model params
+    '''
     exp_name = args.exp_name
     datasets_folder = args.datasets_folder
     resume_model = args.resume_model
