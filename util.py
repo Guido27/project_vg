@@ -38,7 +38,7 @@ def load_args_from_state(state):
     return state["args"]
 
 
-def resume_from_state(state, model, optimizer, resume_random=True):
+def resume_from_state(state, model, optimizer, restore_random=True):
     model.load_state_dict(state["model_state_dict"])
     optimizer.load_state_dict(state["optimizer_state_dict"])
     epoch_num = state["epoch_num"]
@@ -46,7 +46,7 @@ def resume_from_state(state, model, optimizer, resume_random=True):
     best_r5 = state["best_r5"]
     not_improved_num = state["not_improved_num"]
     # For total reproducibility, restore the random generators states
-    if resume_random:
+    if restore_random:
         random.setstate(state["random_state"])
         np.random.set_state(state["numpy_random_state"])
         torch.set_rng_state(state["torch_random_state"])
