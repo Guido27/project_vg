@@ -33,6 +33,8 @@ start_time = datetime.now()
 args.output_folder = join("runs", args.exp_name, start_time.strftime('%Y-%m-%d_%H-%M-%S'))
 commons.setup_logging(args.output_folder)
 commons.make_deterministic(args.seed)
+if checkpoint is not None:
+    logging.info(f"Arguments loaded from checkpoint")
 logging.info(f"Arguments: {args}")
 logging.info(f"The outputs are being saved in {args.output_folder}")
 logging.info(f"Using {torch.cuda.device_count()} GPUs and {multiprocessing.cpu_count()} CPUs")
