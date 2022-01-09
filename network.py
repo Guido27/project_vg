@@ -4,8 +4,8 @@ import logging
 import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
-import netvlad as nv
-import pooling
+from netvlad import NetVLAD
+from pooling import GeM
 
 class GeoLocalizationNet(nn.Module):
     """The model is composed of a backbone and an aggregation layer.
@@ -18,12 +18,12 @@ class GeoLocalizationNet(nn.Module):
         if args.mode == "netvlad":
             logging.debug("Using NetVLAD aggregation")
             self.aggregation = nn.Sequential(L2Norm(),
-                                        nv.NetVLAD(dim=args.features_dim, num_clusters=args.num_clusters, alpha=args.alpha))
+                                        NetVLAD(dim=args.features_dim, num_clusters=args.num_clusters, alpha=args.alpha))
             args.features_dim *= args.num_clusters
         elif args.mode == "gem":
             logging.debug("Using GeM aggregation")
             self.aggregation = nn.Sequential(L2Norm(),
-                                        pooling.GeM(),
+                                        GeM(),
                                         Flatten())
         elif args.mode == "avg_pool":
             logging.debug("Using Avg Pooling aggregation")
