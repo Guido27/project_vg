@@ -23,7 +23,7 @@ args = parser.parse_arguments()
 if args.resume_model is not None:
     state = util.load_state(args.resume_model)
     if state is not None:
-        util.load_args_from_state(state, args)
+        args = util.load_args_from_state(state, args)
 start_time = datetime.now()
 args.output_folder = join("runs", args.exp_name, start_time.strftime('%Y-%m-%d_%H-%M-%S'))
 commons.setup_logging(args.output_folder)

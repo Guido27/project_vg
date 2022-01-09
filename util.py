@@ -46,6 +46,7 @@ def load_args_from_state(state, args):
     args.exp_name = exp_name
     args.datasets_folder = datasets_folder
     args.resume_model = resume_model
+    return args
 
 
 def resume_from_state(state, model, optimizer, resume_random=True):
