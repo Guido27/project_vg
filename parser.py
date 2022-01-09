@@ -28,7 +28,7 @@ def parse_arguments():
                         help="The optimizer to use")
     parser.add_argument("--mode", type=str, default="avg_pool", choices=["avg_pool", "netvlad", "gem"],
                         help="The aggregation mode to use")
-    # NetVlad parameters
+    # NetVLAD parameters
     parser.add_argument("--num_clusters", type=int, default=32,
                         help="How many clusters to use for NetVlad")
     parser.add_argument("--alpha", type=float, default=1.0,

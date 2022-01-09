@@ -16,7 +16,7 @@ class GeoLocalizationNet(nn.Module):
         super().__init__()
         self.backbone = get_backbone(args)
         if args.mode == "netvlad":
-            logging.debug("Using NetVlad aggregation")
+            logging.debug("Using NetVLAD aggregation")
             self.aggregation = nn.Sequential(L2Norm(),
                                         nv.NetVLAD(dim=args.features_dim, num_clusters=args.num_clusters, alpha=args.alpha))
             args.features_dim *= args.num_clusters
