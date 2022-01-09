@@ -60,11 +60,16 @@ model = model.to(args.device)
 
 #### Setup Optimizer and Loss
 if args.optim == "sgd":
+    logging.debug("Using SGD optimizer")
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr)
-elif args.optim =="sgdwithmomentum":
+elif args.optim == "sgd_momentum":
+    logging.debug("Using SGD optimizer with momentum")
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum = 0.9)
-else:   # adam
+elif args.optim == "adam":
+    logging.debug("Using Adam optimizer")
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+else:
+    raise RuntimeError(f"Unknown optimizer {args.optim}")
 criterion_triplet = nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
 
 #### Eventual model resuming

@@ -24,7 +24,7 @@ def parse_arguments():
                         help="How many negatives to consider per each query in the loss")
     parser.add_argument("--neg_samples_num", type=int, default=1000,
                         help="How many negatives to use to compute the hardest ones")
-    parser.add_argument("--optim", type=str, default="adam", choices=["adam", "sgd", "sgdwithmomentum"],
+    parser.add_argument("--optim", type=str, default="adam", choices=["adam", "sgd", "sgd_momentum"],
                         help="The optimizer to use")
     parser.add_argument("--mode", type=str, default="avg_pool", choices=["avg_pool", "netvlad", "gem"],
                         help="The aggregation mode to use")

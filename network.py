@@ -16,17 +16,23 @@ class GeoLocalizationNet(nn.Module):
         super().__init__()
         self.backbone = get_backbone(args)
         if args.mode == "netvlad":
+            logging.debug("Using NetVlad aggregation")
             self.aggregation = nn.Sequential(L2Norm(),
                                         nv.NetVLAD(dim=args.features_dim, num_clusters=args.num_clusters, alpha=args.alpha))
             args.features_dim *= args.num_clusters
         elif args.mode == "gem":
+            logging.debug("Using GeM aggregation")
             self.aggregation = nn.Sequential(L2Norm(),
                                         pooling.GeM(),
                                         Flatten())
-        else:
+        elif args.mode == "avg_pool":
+            logging.debug("Using Avg Pooling aggregation")
             self.aggregation = nn.Sequential(L2Norm(),
                                         torch.nn.AdaptiveAvgPool2d(1),
                                         Flatten())
+        else:
+            raise RuntimeError(f"Unknown mode {args.mode}")
+
     def forward(self, x):
         x = self.backbone(x)
         x = self.aggregation(x)
