@@ -68,9 +68,8 @@ if checkpoint is None:
     best_r5 = 0
     not_improved_num = 0
 else:
-    logging.info(f"Found checkpoint '{args.resume_model}'")
     epoch_num, recalls, best_r5, not_improved_num = util.resume_from_state(checkpoint, model, optimizer)
-    logging.info(f"Successfully loaded model (epoch: {epoch_num}, recalls: {recalls})")
+    logging.info(f"Successfully loaded model from checkpoint (epoch: {epoch_num}, recalls: {recalls})")
     if recalls[1] > best_r5:
         best_r5 = recalls[1]
 del checkpoint
