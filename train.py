@@ -37,7 +37,7 @@ args.output_folder = join("runs", args.exp_name, start_time.strftime('%Y-%m-%d_%
 commons.setup_logging(args.output_folder)
 commons.make_deterministic(args.seed)
 if checkpoint is not None:
-    logging.info(f"Arguments loaded from checkpoint '{args.resume}'")
+    logging.debug(f"Arguments loaded from checkpoint '{args.resume}'")
 logging.info(f"Arguments: {args}")
 logging.info(f"The outputs are being saved in {args.output_folder}")
 logging.info(f"Using {torch.cuda.device_count()} GPUs and {multiprocessing.cpu_count()} CPUs")
@@ -87,7 +87,7 @@ if checkpoint is None:
 else:
     last_epoch_num, recalls, best_r5, not_improved_num = util.resume_from_state(checkpoint, model, optimizer, scheduler)
     if recalls[1] > best_r5: best_r5 = recalls[1]
-    logging.info(f"Successfully loaded model from checkpoint (epoch: {epoch_num}, recalls: {recalls})")
+    logging.debug(f"Successfully loaded model from checkpoint (epoch: {epoch_num}, recalls: {recalls})")
 del checkpoint
 
 
