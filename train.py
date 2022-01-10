@@ -60,27 +60,33 @@ model = model.to(args.device)
 
 #### Setup Optimizer and Loss
 if args.optim == "sgd":
-    logging.debug("Using SGD optimizer")
-    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr)
-elif args.optim == "sgd_momentum":
-    logging.debug("Using SGD optimizer with momentum")
-    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum = 0.9)
+    momentum = 0.9
+    weight_decay = 0.001
+    scheduler_step_size = 5
+    scheduler_gamma = 0.1
+    logging.debug(f"Using SGD optimizer (lr: {args.lr}, momentum: {momentum}, weight-decay {weight_decay})")
+    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=0.9, weight_decay=weight_decay)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=scheduler_step_size, gamma=scheduler_gamma)
+    del momentum
+    del weight_decay
+    del scheduler_step_size
+    del scheduler_gamma
 elif args.optim == "adam":
-    logging.debug("Using Adam optimizer")
+    logging.debug(f"Using Adam optimizer (lr: {args.lr})")
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    scheduler = None
 else:
     raise RuntimeError(f"Unknown optimizer {args.optim}")
 criterion_triplet = nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
 
 #### Eventual model resuming
 if checkpoint is None:
-    epoch_num = 0
+    last_epoch_num = 0
     best_r5 = 0
     not_improved_num = 0
 else:
-    epoch_num, recalls, best_r5, not_improved_num = util.resume_from_state(checkpoint, model, optimizer)
-    if recalls[1] > best_r5:
-        best_r5 = recalls[1]
+    last_epoch_num, recalls, best_r5, not_improved_num = util.resume_from_state(checkpoint, model, optimizer, scheduler)
+    if recalls[1] > best_r5: best_r5 = recalls[1]
     logging.info(f"Successfully loaded model from checkpoint (epoch: {epoch_num}, recalls: {recalls})")
 del checkpoint
 
@@ -88,9 +94,10 @@ del checkpoint
 logging.info(f"Output dimension of the model is {args.features_dim}")
 
 #### Training loop
-while epoch_num < args.epochs_num:
+for epoch_num in range(last_epoch_num + 1, args.epochs_num + 1):
 
-    epoch_num += 1 # count from 1
+    if scheduler is not None:
+        scheduler.step(epoch_num)
 
     logging.info(f"Start training epoch: {epoch_num:02d}")
     
@@ -99,8 +106,8 @@ while epoch_num < args.epochs_num:
     
     # How many loops should an epoch last (default is 5000/1000=5)
     loops_num = math.ceil(args.queries_per_epoch / args.cache_refresh_rate)
-    for loop_num in range(loops_num):
-        logging.debug(f"Cache: {loop_num + 1} / {loops_num}")
+    for loop_num in range(1, loops_num + 1):
+        logging.debug(f"Cache: {loop_num} / {loops_num}")
         
         # Compute triplets to use in the triplet loss
         triplets_ds.is_inference = True
@@ -142,7 +149,7 @@ while epoch_num < args.epochs_num:
             epoch_losses = np.append(epoch_losses, batch_loss)
             del loss_triplet
         
-        logging.debug(f"Epoch[{epoch_num:02d}]({loop_num + 1}/{loops_num}): " +
+        logging.debug(f"Epoch[{epoch_num:02d}]({loop_num}/{loops_num}): " +
                       f"current batch triplet loss = {batch_loss:.4f}, " +
                       f"average epoch triplet loss = {epoch_losses.mean():.4f}")
     
@@ -156,7 +163,7 @@ while epoch_num < args.epochs_num:
     is_best = recalls[1] > best_r5
     
     # Save checkpoint, which contains all training parameters
-    state = util.make_state(args, epoch_num, model, optimizer, recalls, best_r5, not_improved_num)
+    state = util.make_state(args, epoch_num, model, optimizer, scheduler, recalls, best_r5, not_improved_num)
     util.save_checkpoint(args, state, is_best, filename="last_model.pth")
     
     # If recall@5 did not improve for "many" epochs, stop training

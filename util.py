@@ -12,12 +12,13 @@ def save_checkpoint(args, state, is_best, filename):
         shutil.copyfile(model_path, os.path.join(args.output_folder, "best_model.pth"))
 
 
-def make_state(args, epoch_num, model, optimizer, recalls, best_r5, not_improved_num):
+def make_state(args, epoch_num, model, optimizer, scheduler, recalls, best_r5, not_improved_num):
     return {
         "args": args,
         "epoch_num": epoch_num,
         "model_state_dict": model.state_dict(),
         "optimizer_state_dict": optimizer.state_dict(),
+        "scheduler_state_dict": scheduler.state_dict() if scheduler is not None else None,
         "recalls": recalls,
         "best_r5": best_r5,
         "not_improved_num": not_improved_num,
@@ -29,8 +30,7 @@ def make_state(args, epoch_num, model, optimizer, recalls, best_r5, not_improved
 
 
 def load_state(state_path):
-    if not os.path.isfile(state_path):
-        raise FileNotFoundError(f"Checkpoint '{state_path}' does not exist")
+    if not os.path.isfile(state_path): raise FileNotFoundError(f"Checkpoint '{state_path}' does not exist")
     return torch.load(state_path)
 
 
@@ -38,9 +38,10 @@ def load_args_from_state(state):
     return state["args"]
 
 
-def resume_from_state(state, model, optimizer, restore_random=True):
+def resume_from_state(state, model, optimizer, scheduler, restore_random=True):
     model.load_state_dict(state["model_state_dict"])
     optimizer.load_state_dict(state["optimizer_state_dict"])
+    if scheduler is not None: scheduler.load_state_dict(state["scheduler_state_dict"])
     epoch_num = state["epoch_num"]
     recalls = state["recalls"]
     best_r5 = state["best_r5"]
