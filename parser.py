@@ -30,16 +30,16 @@ def parse_arguments():
                         help="The aggregation mode to use")
     # NetVLAD parameters
     parser.add_argument("--num_clusters", type=int, default=32,
-                        help="How many clusters to use for NetVlad")
+                        help="How many clusters to use for NetVLAD")
     parser.add_argument("--alpha", type=float, default=1.0,
-                        help="The alpha parameter to use for NetVlad initialization")
+                        help="The alpha parameter to use for NetVLAD initialization")
     # Other parameters
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--device", type=str, default="cuda", choices=["cuda", "cpu"])
     parser.add_argument("--num_workers", type=int, default=8, help="num_workers for all dataloaders")
     parser.add_argument("--val_positive_dist_threshold", type=int, default=25, help="Val/test threshold in meters")
     parser.add_argument("--train_positives_dist_threshold", type=int, default=10, help="Train threshold in meters")
-    parser.add_argument('--recall_values', type=int, default=[1, 5, 10, 20], nargs="+",
+    parser.add_argument("--recall_values", type=int, default=[1, 5, 10, 20], nargs="+",
                         help="Recalls to be computed, such as R@5.")
     # Paths parameters
     parser.add_argument("--datasets_folder", type=str, required=True, help="Path with datasets")
