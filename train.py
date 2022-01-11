@@ -54,7 +54,7 @@ logging.info(f"Val set: {val_ds}")
 test_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "test")
 logging.info(f"Test set: {test_ds}")
 
-if mode == "netvlad":
+if args.mode == "netvlad":
     args.cluster_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "train")
 
 #### Initialize model
