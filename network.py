@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader, SubsetRandomSampler
 import numpy as np
 import faiss
 from math import ceil
+from tqdm import tqdm
 from netvlad import NetVLAD
 from pooling import GeM
 
