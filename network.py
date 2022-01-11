@@ -4,9 +4,10 @@ import logging
 import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.data import DataLoader, SubsetRandomSampler
+import numpy as np
 import faiss
 from math import ceil
-from torch.utils.data import DataLoader, SubsetRandomSampler
 from netvlad import NetVLAD
 from pooling import GeM
 
