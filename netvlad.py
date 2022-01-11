@@ -15,12 +15,6 @@ class NetVLAD(nn.Module):
                 The number of clusters
             dim : int
                 Dimension of descriptors
-            alpha : float
-                Parameter of initialization. Larger value is harder assignment.
-            normalize_input : bool
-                If true, descriptor-wise L2 normalization is applied to input.
-            vladv2 : bool
-                If true, use vladv2 otherwise use vladv1
         """
         super(NetVLAD, self).__init__()
         self.num_clusters = num_clusters

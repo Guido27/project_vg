@@ -31,8 +31,6 @@ def parse_arguments():
     # NetVLAD parameters
     parser.add_argument("--num_clusters", type=int, default=32,
                         help="How many clusters to use for NetVLAD")
-    parser.add_argument("--alpha", type=float, default=1.0,
-                        help="The alpha parameter to use for NetVLAD initialization")
     # Other parameters
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--device", type=str, default="cuda", choices=["cuda", "cpu"])
