@@ -22,7 +22,7 @@ class GeoLocalizationNet(nn.Module):
         self.backbone = get_backbone(args)
 
         if args.mode == "netvlad":
-            logging.debug("Using NetVLAD aggregation")
+            logging.debug(f"Using NetVLAD aggregation with {args.num_clusters} clusters")
             netvlad = NetVLAD(num_clusters=args.num_clusters, dim=args.features_dim)
             centroids, descriptors = get_clusters(args, self.backbone)
             netvlad.init_params(centroids, descriptors)
@@ -87,6 +87,7 @@ def get_clusters(args, model):
     data_loader = DataLoader(dataset=args.cluster_ds,
                             num_workers=args.num_workers, batch_size=args.infer_batch_size, 
                             shuffle=False, sampler=sampler)
+    logging.debug("Extracting descriptors for NetVLAD clustering")
     with torch.no_grad():
         model = model.eval().to(args.device)
         descriptors = np.zeros(shape=(num_descriptors, args.features_dim), dtype=np.float32)
@@ -100,8 +101,8 @@ def get_clusters(args, model):
                 sample = np.random.choice(image_descriptors.size(1), desc_per_image, replace=False)
                 startix = batchix + ix * desc_per_image
                 descriptors[startix:startix + desc_per_image, :] = image_descriptors[ix, sample, :].detach().cpu().numpy()
+    logging.debug("Clustering...")
     niter = 100
     kmeans = faiss.Kmeans(args.features_dim, args.num_clusters, niter=niter, verbose=False)
     kmeans.train(descriptors)
-    logging.debug(f"NetVLAD centroids shape: {kmeans.centroids.shape}")
     return kmeans.centroids, descriptors
