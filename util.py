@@ -42,6 +42,7 @@ def load_args_from_state(state, parsed_args):
     args.epochs_num = parsed_args.epochs_num
     args.patience = parsed_args.patience
     args.resume = parsed_args.resume
+    args.test_only = parsed_args.test_only
     return args
 
 
