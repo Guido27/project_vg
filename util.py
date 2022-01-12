@@ -4,6 +4,7 @@ import shutil
 import os.path
 import numpy as np
 import random
+import logging
 
 def save_checkpoint(args, state, is_best, filename):
     model_path = os.path.join(args.output_folder, filename)
