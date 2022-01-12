@@ -84,7 +84,7 @@ def get_clusters(args, model):
     desc_per_image = 100
     num_images = ceil(num_descriptors / desc_per_image)
     
-    sampler = SubsetRandomSampler(np.random.choice(len(args.cluster_ds), num_images, replace=True))
+    sampler = SubsetRandomSampler(np.random.choice(len(args.cluster_ds), num_images, replace=False))
     data_loader = DataLoader(dataset=args.cluster_ds,
                             num_workers=args.num_workers, batch_size=args.infer_batch_size, 
                             shuffle=False, sampler=sampler)
