@@ -24,14 +24,7 @@ if args.resume is None:
     checkpoint = None
 else:
     checkpoint = util.load_state(args.resume)
-    parsed_args = args
-    args = util.load_args_from_state(checkpoint)
-    args.exp_name = parsed_args.exp_name
-    args.datasets_folder = parsed_args.datasets_folder
-    args.epochs_num = parsed_args.epochs_num
-    args.patience = parsed_args.patience
-    args.resume = parsed_args.resume
-    del parsed_args
+    args = util.load_args_from_state(checkpoint, args)
 start_time = datetime.now()
 args.output_folder = join("runs", args.exp_name, start_time.strftime('%Y-%m-%d_%H-%M-%S'))
 commons.setup_logging(args.output_folder)
@@ -54,32 +47,16 @@ logging.info(f"Val set: {val_ds}")
 test_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "test")
 logging.info(f"Test set: {test_ds}")
 
-if args.mode == "netvlad":
+if args.resume is None and args.mode == "netvlad":
     args.cluster_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "train")
+    logging.info(f"Cluster set: {args.cluster_ds}")
 
 #### Initialize model
 model = network.GeoLocalizationNet(args)
 model = model.to(args.device)
 
 #### Setup Optimizer and Loss
-if args.optim == "sgd":
-    momentum = 0.9
-    weight_decay = 0.001
-    scheduler_step_size = 5
-    scheduler_gamma = 0.1
-    logging.debug(f"Using SGD optimizer (lr: {args.lr}, momentum: {momentum}, weight-decay {weight_decay})")
-    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=0.9, weight_decay=weight_decay)
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=scheduler_step_size, gamma=scheduler_gamma)
-    del momentum
-    del weight_decay
-    del scheduler_step_size
-    del scheduler_gamma
-elif args.optim == "adam":
-    logging.debug(f"Using Adam optimizer (lr: {args.lr})")
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-    scheduler = None
-else:
-    raise RuntimeError(f"Unknown optimizer {args.optim}")
+optimizer, scheduler = util.get_optimizer(args, model)
 criterion_triplet = nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
 
 #### Eventual model resuming
