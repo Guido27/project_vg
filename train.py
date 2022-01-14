@@ -148,7 +148,7 @@ if not args.test_only:
 
         # Save checkpoint, which contains all training parameters
         state = util.make_state(args, epoch_num, model, optimizer, scheduler, recalls, best_r5, not_improved_num)
-        util.save_checkpoint(args, state, is_best, filename="last_model.pth")
+        util.save_checkpoint(args, state, is_best, filename=f"model_{epoch_num:02d}.pth")
 
         # If recall@5 did not improve for "many" epochs, stop training
         if is_best:
