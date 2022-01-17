@@ -65,7 +65,7 @@ def get_backbone(args):
     return backbone
 
 
-class Flatten(torch.nn.Module):
+class Flatten(nn.Module):
     def __init__(self):
         super().__init__()
     def forward(self, x):
