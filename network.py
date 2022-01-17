@@ -24,6 +24,7 @@ class GeoLocalizationNet(nn.Module):
         self.attention = None
 
         if args.attention:
+            print(Using CBAM attention module)
             self.attention = CBAMBlock(channel=256)
             self.attention.init_weights()
 
