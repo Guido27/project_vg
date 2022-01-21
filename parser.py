@@ -15,7 +15,7 @@ def parse_arguments():
     parser.add_argument("--epochs_num", type=int, default=50,
                         help="Maximum number of epochs to train for")
     parser.add_argument("--patience", type=int, default=3)
-    parser.add_argument("--lr", type=float, default=0.00001, help="Learning rate")
+    parser.add_argument("--lr", type=float, default=0.0001, help="Learning rate")
     parser.add_argument("--cache_refresh_rate", type=int, default=1000,
                         help="How often to refresh cache, in number of queries")
     parser.add_argument("--queries_per_epoch", type=int, default=5000,
@@ -24,28 +24,28 @@ def parse_arguments():
                         help="How many negatives to consider per each query in the loss")
     parser.add_argument("--neg_samples_num", type=int, default=1000,
                         help="How many negatives to use to compute the hardest ones")
-    parser.add_argument("--optim", type=str, default="adam", choices=["adam", "sgd", "sgdwithmomentum"],
+    parser.add_argument("--optim", type=str, default="adam", choices=["adam", "sgd"],
                         help="The optimizer to use")
     parser.add_argument("--mode", type=str, default="avg_pool", choices=["avg_pool", "netvlad", "gem"],
                         help="The aggregation mode to use")
-    # NetVlad parameters
-    parser.add_argument("--num_clusters", type=int, default=32,
-                        help="How many clusters to use for NetVlad")
-    parser.add_argument("--alpha", type=float, default=1.0,
-                        help="The alpha parameter to use for NetVlad initialization")
+    parser.add_argument("--test_only", type=bool, default=False,
+                        help="Whether the model should be trained or not")
+    # NetVLAD parameters
+    parser.add_argument("--num_clusters", type=int, default=64,
+                        help="How many clusters to use for NetVLAD")
     # Other parameters
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--device", type=str, default="cuda", choices=["cuda", "cpu"])
     parser.add_argument("--num_workers", type=int, default=8, help="num_workers for all dataloaders")
     parser.add_argument("--val_positive_dist_threshold", type=int, default=25, help="Val/test threshold in meters")
     parser.add_argument("--train_positives_dist_threshold", type=int, default=10, help="Train threshold in meters")
-    parser.add_argument('--recall_values', type=int, default=[1, 5, 10, 20], nargs="+",
+    parser.add_argument("--recall_values", type=int, default=[1, 5, 10, 20], nargs="+",
                         help="Recalls to be computed, such as R@5.")
     # Paths parameters
     parser.add_argument("--datasets_folder", type=str, required=True, help="Path with datasets")
     parser.add_argument("--exp_name", type=str, default="default",
                         help="Folder name of the current run (saved in ./runs/)")
-    parser.add_argument("--resume_model", type=str, help="The model to resume")
+    parser.add_argument("--resume", type=str, help="The model to resume")
     
     args = parser.parse_args()
     
