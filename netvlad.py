@@ -8,18 +8,16 @@ import numpy as np
 class NetVLAD(nn.Module):
     """NetVLAD layer implementation"""
 
-    def __init__(self, num_clusters=64, dim=128):
+    def __init__(self, dim, num_clusters=64):
         """
         Args:
-            num_clusters : int
-                The number of clusters
             dim : int
                 Dimension of descriptors
+            num_clusters : int
+                The number of clusters
         """
         super(NetVLAD, self).__init__()
         self.num_clusters = num_clusters
-        self.dim = dim
-        self.alpha = 0
         self.conv = nn.Conv2d(dim, num_clusters, kernel_size=(1, 1), bias=False)
         self.centroids = nn.Parameter(torch.rand(num_clusters, dim))
 
@@ -28,9 +26,9 @@ class NetVLAD(nn.Module):
         dots = np.dot(clsts_assign, traindescs.T)
         dots.sort(0)
         dots = dots[::-1, :] # sort, descending
-        self.alpha = (-np.log(0.01) / np.mean(dots[0,:] - dots[1,:])).item()
+        alpha = (-np.log(0.01) / np.mean(dots[0,:] - dots[1,:])).item()
         self.centroids = nn.Parameter(torch.from_numpy(clsts))
-        self.conv.weight = nn.Parameter(torch.from_numpy(self.alpha*clsts_assign).unsqueeze(2).unsqueeze(3))
+        self.conv.weight = nn.Parameter(torch.from_numpy(alpha * clsts_assign).unsqueeze(2).unsqueeze(3))
         self.conv.bias = None
 
     def forward(self, x):

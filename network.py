@@ -23,13 +23,14 @@ class GeoLocalizationNet(nn.Module):
 
         if args.mode == "netvlad":
             logging.debug(f"Using NetVLAD aggregation with {args.num_clusters} clusters")
-            netvlad = NetVLAD(num_clusters=args.num_clusters, dim=args.features_dim)
+            netvlad = NetVLAD(dim=args.features_dim, num_clusters=args.num_clusters)
+            self.aggregation = L2Norm() # nn.Identity() for passthrough
             if args.resume is None:
                 logging.debug("Clustering for NetVLAD initialization")
-                centroids, descriptors = get_clusters(args, self.backbone)
+                centroids, descriptors = get_clusters(args, self)
                 netvlad.init_params(centroids, descriptors)
                 del args.cluster_ds
-            self.aggregation = nn.Sequential(L2Norm(), netvlad)
+            self.aggregation = nn.Sequential(self.aggregation, netvlad)
             args.features_dim *= args.num_clusters
 
         elif args.mode == "gem":
@@ -95,9 +96,7 @@ def get_clusters(args, model):
         descriptors = np.zeros(shape=(num_descriptors, args.features_dim), dtype=np.float32)
         for iteration, (inputs, indices) in enumerate(tqdm(data_loader, ncols=100), 1):
             inputs = inputs.to(args.device)
-            encoder_out = model(inputs)
-            l2_out = F.normalize(encoder_out, p=2, dim=1)
-            image_descriptors = l2_out.view(l2_out.size(0), args.features_dim, -1).permute(0, 2, 1)
+            image_descriptors = model(inputs).view(inputs.size(0), args.features_dim, -1).permute(0, 2, 1)
             batchix = (iteration - 1) * args.infer_batch_size * desc_per_image
             for ix in range(image_descriptors.size(0)):
                 sample = np.random.choice(image_descriptors.size(1), desc_per_image, replace=False)
