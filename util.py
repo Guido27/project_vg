@@ -84,13 +84,16 @@ def get_optimizer(args, model):
 def get_loss(args):
     if args.loss == "triplet":
         logging.debug(f"Using Triplet Loss (margin: {args.margin})")
-        criterion_triplet = losses.TripletLoss(margin=args.margin)
+        criterion = losses.TripletLoss(margin=args.margin)
+    elif args.loss == "sare_joint":
+        logging.debug("Using SARE Joint Loss")
+        criterion = losses.SAREJointLoss()
     else: # torch_triplet
         logging.debug(f"Using Torch's Triplet Loss (margin: {args.margin})")
-        criterion_triplet = torch.nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
+        criterion = torch.nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
     if args.sos:
         logging.debug("Using SOS loss")
         criterion_sos = losses.SOSLoss()
     else:
         criterion_sos = None
-    return criterion_triplet, criterion_sos
+    return criterion, criterion_sos

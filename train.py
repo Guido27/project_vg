@@ -60,7 +60,7 @@ model = model.to(args.device)
 
 #### Setup Optimizer and Loss
 optimizer, scheduler = util.get_optimizer(args, model)
-criterion_triplet, criterion_sos = util.get_loss(args)
+criterion, criterion_sos = util.get_loss(args)
 
 #### Eventual model resuming
 if checkpoint is None:
@@ -119,7 +119,7 @@ if not args.test_only:
                     triplets_local_indexes.view(args.train_batch_size, args.negs_num_per_query, 3), 1, 0)
                 for triplets in triplets_local_indexes:
                     queries_indexes, positives_indexes, negatives_indexes = triplets.T
-                    loss_triplet += criterion_triplet(features[queries_indexes],
+                    loss_triplet += criterion(features[queries_indexes],
                                                       features[positives_indexes],
                                                       features[negatives_indexes])
                     if criterion_sos is not None:
