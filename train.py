@@ -17,6 +17,7 @@ import parser
 import commons
 import network
 import datasets_ws
+import losses
 
 #### Initial setup: parser, logging...
 args = parser.parse_arguments()
@@ -59,7 +60,8 @@ model = model.to(args.device)
 
 #### Setup Optimizer and Loss
 optimizer, scheduler = util.get_optimizer(args, model)
-criterion_triplet = nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
+# criterion_triplet = nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
+criterion_triplet = losses.triplet_loss
 
 #### Eventual model resuming
 if checkpoint is None:
