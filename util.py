@@ -87,7 +87,7 @@ def get_loss(args):
         criterion_triplet = losses.TripletLoss(margin=args.margin)
     else: # torch_triplet
         logging.debug(f"Using Torch's Triplet Loss (margin: {args.margin})")
-        criterion_triplet = nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
+        criterion_triplet = torch.nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
     if args.sos:
         logging.debug("Using SOS loss")
         criterion_sos = losses.SOSLoss()
