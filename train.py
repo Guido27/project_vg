@@ -113,31 +113,31 @@ if not args.test_only:
 
                 # Compute features of all images (images contains queries, positives and negatives)
                 features = model(images.to(args.device))
-                loss_triplet = 0
+                loss = 0
 
                 triplets_local_indexes = torch.transpose(
                     triplets_local_indexes.view(args.train_batch_size, args.negs_num_per_query, 3), 1, 0)
                 for triplets in triplets_local_indexes:
                     queries_indexes, positives_indexes, negatives_indexes = triplets.T
-                    loss_triplet += criterion(features[queries_indexes],
-                                                      features[positives_indexes],
-                                                      features[negatives_indexes])
+                    loss += criterion(features[queries_indexes],
+                                      features[positives_indexes],
+                                      features[negatives_indexes])
                     if criterion_sos is not None:
-                        loss_triplet = args.sos_lambda * criterion_sos(features[queries_indexes],
-                                                                      features[positives_indexes],
-                                                                      features[negatives_indexes])
+                        loss += args.sos_lambda * criterion_sos(features[queries_indexes],
+                                                                features[positives_indexes],
+                                                                features[negatives_indexes])
 
                 del features
-                loss_triplet /= (args.train_batch_size * args.negs_num_per_query)
+                loss /= (args.train_batch_size * args.negs_num_per_query)
 
                 optimizer.zero_grad()
-                loss_triplet.backward()
+                loss.backward()
                 optimizer.step()
 
                 # Keep track of all losses by appending them to epoch_losses
-                batch_loss = loss_triplet.item()
+                batch_loss = loss.item()
                 epoch_losses = np.append(epoch_losses, batch_loss)
-                del loss_triplet
+                del loss
 
             logging.debug(f"Epoch[{epoch_num:02d}]({loop_num}/{loops_num}): " +
                           f"current batch triplet loss = {batch_loss:.4f}, " +
