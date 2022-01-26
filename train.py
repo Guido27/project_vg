@@ -61,7 +61,7 @@ model = model.to(args.device)
 #### Setup Optimizer and Loss
 optimizer, scheduler = util.get_optimizer(args, model)
 # criterion_triplet = nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
-criterion_triplet = losses.triplet_loss
+criterion_triplet = losses.TripletLoss(margin=args.margin)
 
 #### Eventual model resuming
 if checkpoint is None:
