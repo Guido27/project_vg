@@ -123,7 +123,7 @@ if not args.test_only:
                                                       features[positives_indexes],
                                                       features[negatives_indexes])
                     if criterion_sos is not None:
-                        loss_triplet = args.sos_lamba * criterion_sos(features[queries_indexes],
+                        loss_triplet = args.sos_lambda * criterion_sos(features[queries_indexes],
                                                                       features[positives_indexes],
                                                                       features[negatives_indexes])
 
