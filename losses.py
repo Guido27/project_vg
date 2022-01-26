@@ -18,7 +18,7 @@ class TripletLoss(nn.Module):
         super().__init__()
         self.margin = margin
 
-    def forward(anchors, positives, negatives):
+    def forward(self, anchors, positives, negatives):
         # anchors, positives and negatives are N x D (N: number of images, D: dimensionality)
         dist_pos = torch.sum(torch.pow(anchors - positives, 2), dim=1)
         dist_neg = torch.sum(torch.pow(anchors - negatives, 2), dim=1)
@@ -30,7 +30,7 @@ class SOSLoss(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(anchors, positives, negatives):
+    def forward(self, anchors, positives, negatives):
         # anchors, positives and negatives are N x D (N: number of images, D: dimensionality)
         dist_an = torch.sum(torch.pow(anchors - negatives, 2), dim=1)
         dist_pn = torch.sum(torch.pow(positives - negatives, 2), dim=1)
