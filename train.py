@@ -60,8 +60,7 @@ model = model.to(args.device)
 
 #### Setup Optimizer and Loss
 optimizer, scheduler = util.get_optimizer(args, model)
-# criterion_triplet = nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
-criterion_triplet = losses.TripletLoss(margin=args.margin)
+criterion_triplet, criterion_sos = util.get_loss(args)
 
 #### Eventual model resuming
 if checkpoint is None:
@@ -123,6 +122,10 @@ if not args.test_only:
                     loss_triplet += criterion_triplet(features[queries_indexes],
                                                       features[positives_indexes],
                                                       features[negatives_indexes])
+                    if criterion_sos is not None:
+                        loss_triplet += args.sos_lambda * criterion_sos(features[queries_indexes],
+                                                                        features[positives_indexes],
+                                                                        features[negatives_indexes])
                 del features
                 loss_triplet /= (args.train_batch_size * args.negs_num_per_query)
 

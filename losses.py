@@ -24,3 +24,15 @@ class TripletLoss(nn.Module):
         dist_neg = torch.sum(torch.pow(anchors - negatives, 2), dim=1)
         nq = anchors.size(dim=0)
         return torch.sum(torch.clamp(dist_pos - dist_neg + self.margin, min=0)) / nq
+
+
+class SOSLoss(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(anchors, positives, negatives):
+        # anchors, positives and negatives are N x D (N: number of images, D: dimensionality)
+        dist_an = torch.sum(torch.pow(anchors - negatives, 2), dim=1)
+        dist_pn = torch.sum(torch.pow(positives - negatives, 2), dim=1)
+        nq = anchors.size(dim=0)
+        return torch.sum(torch.pow(dist_an - dist_pn, 2)) ** 0.5 / nq

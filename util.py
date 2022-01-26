@@ -5,6 +5,7 @@ import os.path
 import numpy as np
 import random
 import logging
+import losses
 
 def save_checkpoint(args, state, is_best, filename):
     model_path = os.path.join(args.output_folder, filename)
@@ -79,3 +80,17 @@ def get_optimizer(args, model):
     else:
         raise RuntimeError(f"Unknown optimizer {args.optim}")
     return optimizer, scheduler
+
+def get_loss(args):
+    if args.loss == "triplet":
+        logging.debug(f"Using Triplet Loss (margin: {args.margin})")
+        criterion_triplet = losses.TripletLoss(margin=args.margin)
+    else: # torch_triplet
+        logging.debug(f"Using Torch's Triplet Loss (margin: {args.margin})")
+        criterion_triplet = nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
+    if args.sos:
+        logging.debug("Using SOS loss")
+        criterion_sos = losses.SOSLoss()
+    else:
+        criterion_sos = None
+    return criterion_triplet, criterion_sos
