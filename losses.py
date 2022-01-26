@@ -25,7 +25,7 @@ def triplet_loss(anchors, positives, negatives, margin=0.1):
     dist_pos = torch.sum(torch.pow(anchors - positives, 2), dim=0)
     dist_neg = torch.sum(torch.pow(anchors - negatives, 2), dim=0)
 
-    # nq = 
-    print(anchors.size())
+    nq = anchors.size(dim=0)
+    print("nq: ", nq)
 
     return torch.sum(torch.clamp(dist_pos - dist_neg + margin, min=0)) / nq
