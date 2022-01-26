@@ -22,8 +22,9 @@ def triplet_loss(anchors, positives, negatives, margin=0.1):
     # xp = x[:, label.data==1].permute(1,0).repeat(1,S-2).view((S-2)*nq,dim).permute(1,0)
     # xn = x[:, label.data==0]
 
-    dist_pos = torch.sum(torch.pow(anchors - positives, 2), dim=0)
-    dist_neg = torch.sum(torch.pow(anchors - negatives, 2), dim=0)
+    # anchors is 4 X N_features
+    dist_pos = torch.sum(torch.pow(anchors - positives, 2), dim=1) # 4 X 1
+    dist_neg = torch.sum(torch.pow(anchors - negatives, 2), dim=1)
 
     nq = anchors.size(dim=0)
 
