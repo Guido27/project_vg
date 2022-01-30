@@ -21,7 +21,7 @@ args = parser.parse_arguments()
 
 if args.augment == "grayscale":
     base_transform = transforms.Compose([
-        transforms.Grayscale(),
+        transforms.Grayscale(num_output_channels=3),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
