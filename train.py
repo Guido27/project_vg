@@ -138,7 +138,6 @@ if not args.test_only:
 
                 #output_features should be a tensor made by 3 columns: (queries,positive,negative) features, in this way each row is a triplet    
                 output_features= torch.cat((output_features,queri_features,positive_features,negative_features)) 
-                print("Output feature size is: ",output_features.size())
                 print("Output feature shape is: ",output_features.shape())
                 
                 #loss
