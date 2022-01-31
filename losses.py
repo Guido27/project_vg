@@ -46,7 +46,4 @@ class SAREJointLoss(nn.Module):
     def forward(self, anchors, positives, negatives):
         dist_pos = torch.sum(torch.pow(anchors - positives, 2), dim=1)
         dist_neg = torch.sum(torch.pow(anchors - negatives, 2), dim=1)
-
-        dist = -torch.cat((dist_pos, dist_neg))
-        dist = F.log_softmax(dist, dim=0)
-        return -dist.mean()
+        return torch.sum(dist_pos + torch.logaddexp(-dist_pos, -dist_neg)).mean
