@@ -1,7 +1,7 @@
 import torch
 from torch.nn import functional as F
 
-#B is batch size and N is number of images per triplets (3) 
+#B is batch size and N is number of features per triplets (3) 
 def get_loss(outputs, loss_type, B, N): 
         outputs = outputs.view(B, N, -1)
         L = outputs.size(-1)
