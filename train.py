@@ -123,23 +123,19 @@ if not args.test_only:
                     #loss += criterion(features[queries_indexes],
                     #                  features[positives_indexes],
                     #                  features[negatives_indexes])
+                
                 output_features = torch.Tensor().to(args.device)
-                queri_features = torch.Tensor().to(args.device)
-                positive_features = torch.Tensor().to(args.device)
-                negative_features = torch.Tensor().to(args.device)
+                #queri_features = torch.Tensor().to(args.device)
+                #positive_features = torch.Tensor().to(args.device)
+                #negative_features = torch.Tensor().to(args.device)
 
-                
-                queri_features = features[queries_indexes] 
-                #print("query features size is ",queri_features.size())
-                positive_features = features[positives_indexes]
-                #print("positive features size is ",queri_features.size())
-                negative_features = features[negatives_indexes]
-                #print("negative features size is ",queri_features.size())
-
-                #output_features should be a tensor made by 3 columns: (queries,positive,negative) features, in this way each row is a triplet    
-                output_features= torch.cat((output_features,queri_features,positive_features,negative_features)) 
-                #print("Output_feature size is: ",output_features.size())
-                
+                for x in queries_indexes:
+                    queri = features[x] 
+                    for y in positives_indexes:
+                       positive = features[y] 
+                       for z in negatives_indexes:
+                           negative = features[z]
+                           output_features = torch.cat((output_features,queri,positive,negative)) 
                 #loss
                 loss += sare_loss.get_loss(output_features,'sare_joint',args.train_batch_size,3)
                     
