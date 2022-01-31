@@ -128,13 +128,15 @@ if not args.test_only:
                 positive_features = torch.Tensor().to(args.device)
                 negative_features = torch.Tensor().to(args.device)
 
-                for queri in queries_indexes:
-                    queri_features = torch.cat((queri_features,features[queri]),1) #cat as column
+                #for queri in queries_indexes:
+                    #queri_features = torch.cat((queri_features,features[queri])) #cat as column
+                queri_features= features[queries_indexes]
+                print(queri_features)
                 for positive in positives_indexes:
                     positive_features = torch.cat((positive_features,features[positive]),1) #cat as column
                 for negative in negatives_indexes:
                     negative_features = torch.cat((negative_features, features[negative]),1) #cat as column
-                #output_features should be a tensor made by 3 columns: queries,positive,negative features, in this way each row is a triplet    
+                #output_features should be a tensor made by 3 columns: (queries,positive,negative) features, in this way each row is a triplet    
                 output_features= torch.cat((output_features,queri_features,positive_features,negative_features)) 
                 loss += sare_loss.get_loss(output_features,'sare_joint',args.train_batch_size,3)
                     
