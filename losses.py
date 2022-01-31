@@ -1,17 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-
-
-def loss(anchors, positives, negatives):
-    dist_pos = ((anchors - positives) ** 2).sum(1)
-    dist_neg = ((anchors - negatives) ** 2).sum(1)
-
-    dist = -torch.cat((dist_pos, dist_neg), 1)
-    dist = F.log_softmax(dist, 1)
-    loss = (-dist[:, 0]).mean()
-
-    return loss
 
 
 class TripletLoss(nn.Module):
