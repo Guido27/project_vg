@@ -1,13 +1,7 @@
 import torch
 from torch.nn import functional as F
 
-def _parse_data(self, inputs):
-        imgs = [input[0] for input in inputs]
-        imgs = torch.stack(imgs).permute(1,0,2,3,4)
-        # imgs_size: batch_size*triplet_size*C*H*W => B, N, C, H, W
-        return imgs.cuda(self.gpu)
-
-#output is the output of the net!!!
+#B is batch size and N is number of images per triplets (3) 
 def get_loss(outputs, loss_type, B, N): 
         outputs = outputs.view(B, N, -1)
         L = outputs.size(-1)
@@ -17,7 +11,6 @@ def get_loss(outputs, loss_type, B, N):
         output_positives = outputs[:, 1]
 
         if (loss_type=='sare_joint'):
-            print("Using SARE joint Loss")
             dist_pos = ((output_anchors - output_positives)**2).sum(1)
             dist_pos = dist_pos.view(B, 1)
 

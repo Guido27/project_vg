@@ -61,7 +61,7 @@ model = model.to(args.device)
 
 #### Setup Optimizer and Loss
 optimizer, scheduler = util.get_optimizer(args, model)
-criterion, criterion_sos = util.get_loss(args)
+#criterion, criterion_sos = util.get_loss(args)
 
 #### Eventual model resuming
 if checkpoint is None:

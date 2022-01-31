@@ -38,14 +38,14 @@ class SOSLoss(nn.Module):
         return torch.sum(torch.pow(dist_an - dist_pn, 2)) ** 0.5 / nq
 
 
-class SAREJointLoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, anchors, positives, negatives):
-        dist_pos = torch.sum(torch.pow(anchors - positives, 2), dim=1)
-        dist_neg = torch.sum(torch.pow(anchors - negatives, 2), dim=1)
-
-        dist = - torch.cat((dist_pos, dist_neg))
-        dist = F.log_softmax(dist, dim=0)
-        return - dist.mean()
+#class SAREJointLoss(nn.Module):
+#    def __init__(self):
+#        super().__init__()
+#
+#    def forward(self, anchors, positives, negatives):
+#        dist_pos = torch.sum(torch.pow(anchors - positives, 2), dim=1)
+#        dist_neg = torch.sum(torch.pow(anchors - negatives, 2), dim=1)
+#
+#        dist = - torch.cat((dist_pos, dist_neg))
+#        dist = F.log_softmax(dist, dim=0)
+#        return - dist.mean()
