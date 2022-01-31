@@ -31,7 +31,7 @@ def parse_arguments():
     parser.add_argument("--test_only", type=bool, default=False,
                         help="Whether the model should be trained or not")
     parser.add_argument("--loss", type=str, default="torch_triplet",
-                        choices=["torch_triplet", "triplet", "sare_joint"],
+                        choices=["torch_triplet", "triplet", "sare_ind"],
                         help="The loss to use")
     parser.add_argument("--sos", type=bool, default=False,
                         help="whether to use sos loss")

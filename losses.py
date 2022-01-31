@@ -39,7 +39,7 @@ class SOSLoss(nn.Module):
         return torch.sum(torch.pow(dist_an - dist_pn, 2)) ** 0.5 / nq
 
 
-class SAREJointLoss(nn.Module):
+class SAREIndLoss(nn.Module):
     def __init__(self):
         super().__init__()
 
