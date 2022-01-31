@@ -18,6 +18,7 @@ import commons
 import network
 import datasets_ws
 import losses
+import sare_loss
 
 #### Initial setup: parser, logging...
 args = parser.parse_arguments()
@@ -119,14 +120,24 @@ if not args.test_only:
                     triplets_local_indexes.view(args.train_batch_size, args.negs_num_per_query, 3), 1, 0)
                 for triplets in triplets_local_indexes:
                     queries_indexes, positives_indexes, negatives_indexes = triplets.T
-                    loss += criterion(features[queries_indexes],
-                                      features[positives_indexes],
-                                      features[negatives_indexes])
-                    if criterion_sos is not None:
-                        loss += args.sos_lambda * criterion_sos(features[queries_indexes],
-                                                                features[positives_indexes],
-                                                                features[negatives_indexes])
+                    #loss += criterion(features[queries_indexes],
+                    #                  features[positives_indexes],
+                    #                  features[negatives_indexes])
+                output_features = torch.Tensor().to(args.device)
+                queri_features = torch.Tensor().to(args.device)
+                positive_features = torch.Tensor().to(args.device)
+                negative_features = torch.Tensor().to(args.device)
 
+                for queri in queries_indexes:
+                    queri_features = queri_features.cat(features[queri])
+                for positive in positives_indexes:
+                    positive_features = positive_features.cat(features[positive])
+                for negative in negatives_indexes:
+                    negative_features = negative_features.cat(features[negative])
+                output_features= output_features.cat((queri_features,positive_features,negative_features),1)
+                loss += sare_loss.get_loss(output_features,'sare_joint',args.train_batch_size,3)
+                    
+                    
                 del features
                 loss /= (args.train_batch_size * args.negs_num_per_query)
 
