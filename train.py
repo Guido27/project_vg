@@ -130,12 +130,17 @@ if not args.test_only:
 
                 
                 queri_features = features[queries_indexes] 
+                print("query features size is ",queri_features.size())
                 positive_features = features[positives_indexes]
+                print("positive features size is ",queri_features.size())
                 negative_features = features[negatives_indexes]
+                print("negative features size is ",queri_features.size())
 
                 #output_features should be a tensor made by 3 columns: (queries,positive,negative) features, in this way each row is a triplet    
                 output_features= torch.cat((output_features,queri_features,positive_features,negative_features)) 
                 print("Output feature size is: ",output_features.size())
+                print("Output feature shape is: ",output_features.shape())
+                
                 #loss
                 loss += sare_loss.get_loss(output_features,'sare_joint',args.train_batch_size,3)
                     
