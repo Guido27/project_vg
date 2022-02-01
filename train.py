@@ -111,10 +111,6 @@ if not args.test_only:
             # images shape: (train_batch_size*12)*3*H*W ; by default train_batch_size=4, H=480, W=640
             # triplets_local_indexes shape: (train_batch_size*10)*3 ; because 10 triplets per query
             
-            output_features = torch.Tensor().to(args.device)
-            queri_features = torch.Tensor().to(args.device)
-            positive_features = torch.Tensor().to(args.device)
-            negative_features = torch.Tensor().to(args.device)
 
             for images, triplets_local_indexes, _ in tqdm(triplets_dl, ncols=100):
 
@@ -132,23 +128,17 @@ if not args.test_only:
                 
                 
 
-                queri_features = features[queries_indexes] 
-                positive_features = features[positives_indexes]
-                negative_features = features[negatives_indexes]
+                #queri_features = features[queries_indexes] 
+                #positive_features = features[positives_indexes]
+                #negative_features = features[negatives_indexes]
 
-                output_features2 = torch.Tensor().to(args.device)
+                output_features = torch.Tensor().to(args.device)
                 for q, p, n in zip(queries_indexes, positives_indexes, negatives_indexes):
                     queries = features[q]
                     positives = features[p]
                     negatives = features[n]
-                    output_features2 = torch.cat((output_features, queries, positives, negatives))
+                    output_features = torch.cat((output_features, queries, positives, negatives))
                 
-                #output_features should be a tensor made by 3 columns: (queries,positive,negative) features, in this way each row is a triplet    
-                output_features=torch.cat((output_features,queri_features,positive_features,negative_features)) 
-                print("********My output features:\n",output_features)
-                print("********Their output features:\n",output_features2)
-
-
                 #loss
                 loss += sare_loss.get_loss(output_features,args.sare_type,args.train_batch_size,3)
                     
