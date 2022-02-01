@@ -130,7 +130,7 @@ if not args.test_only:
                 negative_features = torch.Tensor().to(args.device)
 
                 queri_features = features[queries_indexes] 
-                print(queri_features)
+                print("**************************\n",queri_features)
                 positive_features = features[positives_indexes]
                 negative_features = features[negatives_indexes]
 
