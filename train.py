@@ -137,7 +137,7 @@ if not args.test_only:
                            negative = features[z]
                            output_features = torch.cat((output_features,queri,positive,negative)) 
                 #loss
-                loss += sare_loss.get_loss(output_features,'sare_joint',args.train_batch_size,3)
+                loss += sare_loss.get_loss(output_features,args.sare_type,args.train_batch_size,3)
                     
                     
                 del features
