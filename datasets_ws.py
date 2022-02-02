@@ -21,7 +21,7 @@ args = parser.parse_arguments()
 
 if args.augment == "color_jitter":
     base_transform = transforms.Compose([
-        transforms.ColorJitter(brigthness=2),
+        transforms.ColorJitter(brightness=2),
         transforms.ColorJitter(contrast=2),
         transforms.ColorJitter(saturation=2),
         transforms.ToTensor(),
