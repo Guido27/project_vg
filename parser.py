@@ -47,6 +47,9 @@ def parse_arguments():
                         help="Folder name of the current run (saved in ./runs/)")
     parser.add_argument("--resume", type=str, help="The model to resume")
     
+    parser.add_argument("--attention", type=bool, default=False,
+                        help="Whether use CBAM attention model or not")
+
     args = parser.parse_args()
     
     if args.queries_per_epoch % args.cache_refresh_rate != 0:
