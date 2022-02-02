@@ -28,14 +28,6 @@ if args.augment == "color_jitter":
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
 
-
-elif args.augment == "contrast":
-    base_transform = transforms.Compose([
-        transforms.ColorJitter(contrast=2),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ])
-
 else:
     base_transform = transforms.Compose([
         transforms.ToTensor(),
