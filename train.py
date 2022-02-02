@@ -18,6 +18,7 @@ import commons
 import network
 import datasets_ws
 import losses
+import sare_loss
 
 #### Initial setup: parser, logging...
 args = parser.parse_arguments()
@@ -60,7 +61,7 @@ model = model.to(args.device)
 
 #### Setup Optimizer and Loss
 optimizer, scheduler = util.get_optimizer(args, model)
-criterion, criterion_sos = util.get_loss(args)
+#criterion, criterion_sos = util.get_loss(args)
 
 #### Eventual model resuming
 if checkpoint is None:
@@ -109,6 +110,8 @@ if not args.test_only:
 
             # images shape: (train_batch_size*12)*3*H*W ; by default train_batch_size=4, H=480, W=640
             # triplets_local_indexes shape: (train_batch_size*10)*3 ; because 10 triplets per query
+            
+
             for images, triplets_local_indexes, _ in tqdm(triplets_dl, ncols=100):
 
                 # Compute features of all images (images contains queries, positives and negatives)
@@ -119,14 +122,27 @@ if not args.test_only:
                     triplets_local_indexes.view(args.train_batch_size, args.negs_num_per_query, 3), 1, 0)
                 for triplets in triplets_local_indexes:
                     queries_indexes, positives_indexes, negatives_indexes = triplets.T
-                    loss += criterion(features[queries_indexes],
-                                      features[positives_indexes],
-                                      features[negatives_indexes])
-                    if criterion_sos is not None:
-                        loss += args.sos_lambda * criterion_sos(features[queries_indexes],
-                                                                features[positives_indexes],
-                                                                features[negatives_indexes])
+                    #loss += criterion(features[queries_indexes],
+                    #                  features[positives_indexes],
+                    #                  features[negatives_indexes])
 
+                output_features = torch.Tensor().to(args.device)
+                #queries_indexes,positive_indexes and negative_indexes have the same length
+                for x in range(len(queries_indexes)):
+                    #get queri, pos and neg index
+                    q = queries_indexes[x]
+                    p = positives_indexes[x]
+                    n = negatives_indexes[x]
+                    #get corresponding features
+                    queri = features[q]
+                    positive = features[p]
+                    negative = features[n]
+                    #update input tensor for sare_loss
+                    output_features = torch.cat((output_features, queri, positive, negative))
+                
+                #loss
+                loss += sare_loss.get_loss(output_features,args.sare_type,args.train_batch_size,3)
+                    
                 del features
                 loss /= (args.train_batch_size * args.negs_num_per_query)
 
