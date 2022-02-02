@@ -61,7 +61,7 @@ model = model.to(args.device)
 
 #### Setup Optimizer and Loss
 optimizer, scheduler = util.get_optimizer(args, model)
-#criterion, criterion_sos = util.get_loss(args)
+criterion, criterion_sos = util.get_loss(args)
 
 #### Eventual model resuming
 if checkpoint is None:
@@ -118,31 +118,33 @@ if not args.test_only:
                 features = model(images.to(args.device))
                 loss = 0
 
-                triplets_local_indexes = torch.transpose(
-                    triplets_local_indexes.view(args.train_batch_size, args.negs_num_per_query, 3), 1, 0)
-                for triplets in triplets_local_indexes:
-                    queries_indexes, positives_indexes, negatives_indexes = triplets.T
-                    #loss += criterion(features[queries_indexes],
-                    #                  features[positives_indexes],
-                    #                  features[negatives_indexes])
+                if(args.loss=="torch_triplet"):
+                    triplets_local_indexes = torch.transpose(
+                        triplets_local_indexes.view(args.train_batch_size, args.negs_num_per_query, 3), 1, 0)
+                    for triplets in triplets_local_indexes:
+                        queries_indexes, positives_indexes, negatives_indexes = triplets.T
+                        loss += criterion(features[queries_indexes],
+                                          features[positives_indexes],
+                                          features[negatives_indexes])
 
-                output_features = torch.Tensor().to(args.device)
-                #queries_indexes,positive_indexes and negative_indexes have the same length
-                for x in range(len(queries_indexes)):
-                    #get queri, pos and neg index
-                    q = queries_indexes[x]
-                    p = positives_indexes[x]
-                    n = negatives_indexes[x]
-                    #get corresponding features
-                    queri = features[q]
-                    positive = features[p]
-                    negative = features[n]
-                    #update input tensor for sare_loss
-                    output_features = torch.cat((output_features, queri, positive, negative))
-                
-                #loss
-                loss += sare_loss.get_loss(output_features,args.sare_type,args.train_batch_size,3)
-                    
+                elif(args.loss=="sare_joint" or args.loss=="sare_ind"):
+                    output_features = torch.Tensor().to(args.device)
+                    #queries_indexes,positive_indexes and negative_indexes have the same length
+                    for x in range(len(queries_indexes)):
+                        #get queri, pos and neg index
+                        q = queries_indexes[x]
+                        p = positives_indexes[x]
+                        n = negatives_indexes[x]
+                        #get corresponding features
+                        queri = features[q]
+                        positive = features[p]
+                        negative = features[n]
+                        #update input tensor for sare_loss
+                        output_features = torch.cat((output_features, queri, positive, negative))
+
+                    #loss
+                    loss += sare_loss.get_loss(output_features,args.sare_type,args.train_batch_size,3)
+
                 del features
                 loss /= (args.train_batch_size * args.negs_num_per_query)
 

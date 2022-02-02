@@ -31,16 +31,13 @@ def parse_arguments():
     parser.add_argument("--test_only", type=bool, default=False,
                         help="Whether the model should be trained or not")
     parser.add_argument("--loss", type=str, default="torch_triplet",
-                        choices=["torch_triplet", "triplet", "sare_joint"],
+                        choices=["torch_triplet", "triplet", "sare_joint", "sare_ind"],
                         help="The loss to use")
     parser.add_argument("--sos", type=bool, default=False,
                         help="whether to use sos loss")
     parser.add_argument("--sos_lambda", type=float, default=5,
                         help="the lambda param for sos loss")
-    parser.add_argument("--sare_type", type=str, default="sare_joint",
-                        choices=["sare_joint", "sare_ind"],
-                        help="the lambda param for sos loss")
-    # NetVLAD parameters
+       # NetVLAD parameters
     parser.add_argument("--num_clusters", type=int, default=64,
                         help="How many clusters to use for NetVLAD")
     # Other parameters
