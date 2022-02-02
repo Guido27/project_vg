@@ -30,6 +30,7 @@ if args.augment == "color_jitter":
 
 elif args.augment is None:
     base_transform = transforms.Compose([
+        # transforms.Resize((525, 700)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
