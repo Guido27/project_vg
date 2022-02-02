@@ -48,7 +48,7 @@ def parse_arguments():
     parser.add_argument("--train_positives_dist_threshold", type=int, default=10, help="Train threshold in meters")
     parser.add_argument("--recall_values", type=int, default=[1, 5, 10, 20], nargs="+",
                         help="Recalls to be computed, such as R@5.")
-    parser.add_argument("--augment", type=str, choices=["grayscale", "flip", "contrast"],
+    parser.add_argument("--augment", type=str, choices=["color_jitter", "contrast"],
                         help="The augmentation to use on training set")
     # Paths parameters
     parser.add_argument("--datasets_folder", type=str, required=True, help="Path with datasets")

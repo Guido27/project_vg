@@ -19,19 +19,15 @@ args = parser.parse_arguments()
 
 ###Transformation for training
 
-if args.augment == "grayscale":
+if args.augment == "color_jitter":
     base_transform = transforms.Compose([
-        transforms.Grayscale(num_output_channels=3),
+        transforms.ColorJitter(brigthness=2),
+        transforms.ColorJitter(contrast=2),
+        transforms.ColorJitter(saturation=2),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
 
-elif args.augment == "flip":
-    base_transform = transforms.Compose([
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ])
 
 elif args.augment == "contrast":
     base_transform = transforms.Compose([
