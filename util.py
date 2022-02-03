@@ -5,7 +5,7 @@ import os.path
 import numpy as np
 import random
 import logging
-import losses
+import sos_loss
 
 def save_checkpoint(args, state, is_best, filename):
     model_path = os.path.join(args.output_folder, filename)
@@ -91,7 +91,7 @@ def get_loss(args):
         #to use SARE we need to calculate features before, we do that in train.py
     if args.sos:
         logging.debug("Using SOS loss")
-        criterion_sos = losses.SOSLoss()
+        criterion_sos = sos_loss.SOSLoss()
     else:
         criterion_sos = None
     return criterion, criterion_sos
