@@ -26,7 +26,7 @@ class GeoLocalizationNet(nn.Module):
 
         # CBAM
         if args.attention:
-            print("Using CBAM attention module")
+            logging.debug("Using CBAM attention module")
             self.attention = CBAMBlock(channel=256)
             self.attention.init_weights()
         else:
@@ -34,6 +34,7 @@ class GeoLocalizationNet(nn.Module):
 
         # CRN
         if args.crn:
+            logging.debug("Using CRN")
             self.crn = CRN(args.features_dim)
         else:
             self.crn = None
@@ -47,7 +48,7 @@ class GeoLocalizationNet(nn.Module):
                 centroids, descriptors = get_clusters(args, self)
                 netvlad.init_params(centroids, descriptors)
                 del args.cluster_ds
-            self.aggregation = nn.Sequential(self.aggregation, netvlad)
+            self.aggregation = netvlad
             args.features_dim *= args.num_clusters
 
         elif args.mode == "gem":
