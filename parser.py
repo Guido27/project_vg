@@ -53,10 +53,8 @@ def parse_arguments():
                         help="whether to use sos loss")
     parser.add_argument("--sos_lambda", type=float, default=5,
                         help="the lambda param for sos loss")
-    parser.add_argument("--attention", type=bool, default=False,
-                        help="Whether use CBAM attention model or not")
-    parser.add_argument("--crn", type=bool, default=False,
-                        help="Whether to use CRN or not")
+    parser.add_argument("--attention", type=str, default=None, choices=["cbam", "crn"],
+                        help="The attention mode to use (CBAM or CRN), if any")
 
     # NetVLAD only
     parser.add_argument("--num_clusters", type=int, default=64,
