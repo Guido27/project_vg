@@ -31,9 +31,6 @@ class GeoLocalizationNet(nn.Module):
             logging.debug("Using CBAM attention module")
             self.cbam = CBAMBlock(channel=args.features_dim)
             self.cbam.init_weights()
-        elif args.attention == "crn":
-            logging.debug("Using CRN")
-            self.crn = CRN(args.features_dim)
 
         if args.mode == "netvlad":
             logging.debug(
@@ -47,6 +44,9 @@ class GeoLocalizationNet(nn.Module):
                 netvlad.init_params(centroids, descriptors)
                 del args.cluster_ds
             self.aggregation = netvlad
+            if args.attention == "crn":
+                logging.debug("Using CRN")
+                self.crn = CRN(args.features_dim)
             args.features_dim *= args.num_clusters
 
         elif args.mode == "gem":
@@ -61,6 +61,7 @@ class GeoLocalizationNet(nn.Module):
             raise RuntimeError(f"Unknown mode {args.mode}")
 
         assert self.aggregation is not None
+        assert self.cbam is None or self.crn is None
 
     def forward(self, x):
         x = self.backbone(x)
@@ -74,10 +75,10 @@ class GeoLocalizationNet(nn.Module):
         x = F.normalize(x, p=2, dim=1)
 
         if self.aggregation is not None:
-            if self.crn is not None:
-                x = self.aggregation(x, crm=crm)
-            else:
+            if self.crn is None:
                 x = self.aggregation(x)
+            else:
+                x = self.aggregation(x, crm=crm)
 
         return x
 
