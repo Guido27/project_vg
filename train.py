@@ -116,7 +116,6 @@ if not args.test_only:
                 # Compute features of all images (images contains queries, positives and negatives)
                 features = model(images.to(args.device))
                 loss = 0
-
                 
                 triplets_local_indexes = torch.transpose(
                     triplets_local_indexes.view(args.train_batch_size, args.negs_num_per_query, 3), 1, 0)
