@@ -81,17 +81,22 @@ def get_optimizer(args, model):
         raise RuntimeError(f"Unknown optimizer {args.optim}")
     return optimizer, scheduler
 
+
 def get_loss(args):
     if args.loss == "triplet":
         logging.debug(f"Using Torch's Triplet Loss (margin: {args.margin})")
         criterion = torch.nn.TripletMarginLoss(margin=args.margin, p=2, reduction="sum")
-    if args.loss == "sare_joint" or args.loss== "sare_ind":
+    elif args.loss == "sare_joint" or args.loss == "sare_ind":
         logging.debug(f"Using {args.loss} Loss")
         criterion = None
         #to use SARE we need to calculate features before, we do that in train.py
+    else:
+        raise RuntimeError(f"Unknown loss {args.loss}")
+
     if args.sos:
         logging.debug("Using SOS loss")
         criterion_sos = sos_loss.SOSLoss()
     else:
         criterion_sos = None
+
     return criterion, criterion_sos

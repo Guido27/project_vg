@@ -30,8 +30,8 @@ def parse_arguments():
                         help="The aggregation mode to use")
     parser.add_argument("--test_only", type=bool, default=False,
                         help="Whether the model should be trained or not")
-    parser.add_argument("--loss", type=str, default="torch_triplet",
-                        choices=["torch_triplet", "triplet", "sare_joint", "sare_ind"],
+    parser.add_argument("--loss", type=str, default="triplet",
+                        choices=["triplet", "sare_joint", "sare_ind"],
                         help="The loss to use")
     parser.add_argument("--sos", type=bool, default=False,
                         help="whether to use sos loss")
