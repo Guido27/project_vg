@@ -69,7 +69,7 @@ class GeoLocalizationNet(nn.Module):
         if self.cbam is not None:
             x = self.cbam(x)
         elif self.crn is not None:
-            crm = self.crn(x)  # contextual reweighting map
+            crm = self.crn(x)  # contextual reweighting mask
 
         # L2 normalization
         x = F.normalize(x, p=2, dim=1)
