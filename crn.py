@@ -31,7 +31,8 @@ class CRN(torch.nn.Module):
         _init_weights(self.conv_accum)
 
     def forward(self, x):
-        input_h, input_w = x.shape[2:]
+        input_h_w = x.shape[2:]
+        assert len(input_h_w) == 2
 
         x = self.downsample(x)
 
@@ -42,7 +43,7 @@ class CRN(torch.nn.Module):
         x = F.relu(self.conv_accum(x))
 
         # Upsampling to restore input HxW
-        x = F.interpolate(x, (input_h, input_w))
+        x = F.interpolate(x, input_h_w)
 
         return x
 
