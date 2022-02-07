@@ -128,20 +128,20 @@ if not args.test_only:
                                           features[negatives_indexes])
                     else:
                         output_features = torch.Tensor().to(args.device)
-                        #queries_indexes,positive_indexes and negative_indexes have the same length
+                        # queries_indexes,positive_indexes and negative_indexes have the same length
                         for x in range(len(queries_indexes)):
-                            #get queri, pos and neg index
+                            # get query, pos and neg index
                             q = queries_indexes[x]
                             p = positives_indexes[x]
                             n = negatives_indexes[x]
-                            #get corresponding features
-                            queri = features[q]
+                            # get corresponding features
+                            query = features[q]
                             positive = features[p]
                             negative = features[n]
-                            #update input tensor for sare_loss
-                            output_features = torch.cat((output_features, queri, positive, negative))
-                        #loss
-                        loss += sare_loss.get_loss(output_features,args.loss,args.train_batch_size,3)
+                            # update input tensor for sare_loss
+                            output_features = torch.cat((output_features, query, positive, negative))
+                        # loss
+                        loss += sare_loss.get_loss(output_features, args.loss, args.train_batch_size, 3)
 
                 del features
                 loss /= (args.train_batch_size * args.negs_num_per_query)
