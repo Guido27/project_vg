@@ -50,17 +50,16 @@ class NetVLAD(nn.Module):
         vlad = torch.zeros(
             [N, self.num_clusters, C], dtype=x.dtype, layout=x.layout, device=x.device
         )
-        for C in range(
-            self.num_clusters
-        ):  # slower than non-looped, but lower memory usage
+        # slower than non-looped, but lower memory usage
+        for c in range(self.num_clusters):
             residual = x_flatten.unsqueeze(0).permute(1, 0, 2, 3) - self.centroids[
-                C : C + 1, :
+                c : c + 1, :
             ].expand(x_flatten.size(-1), -1, -1).permute(1, 2, 0).unsqueeze(0)
-            residual *= soft_assign[:, C : C + 1, :].unsqueeze(2)
-            vlad[:, C : C + 1, :] = residual.sum(dim=-1)
+            residual *= soft_assign[:, c : c + 1, :].unsqueeze(2)
+            vlad[:, c : c + 1, :] = residual.sum(dim=-1)
 
         vlad = F.normalize(vlad, p=2, dim=2)  # intra-normalization
-        vlad = vlad.view(x.size(0), -1)  # flatten
+        vlad = vlad.view(N, -1)  # flatten
         vlad = F.normalize(vlad, p=2, dim=1)  # L2 normalize
 
         return vlad
