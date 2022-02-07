@@ -122,7 +122,7 @@ if not args.test_only:
                     triplets_local_indexes.view(args.train_batch_size, args.negs_num_per_query, 3), 1, 0)
                 for triplets in triplets_local_indexes:
                     queries_indexes, positives_indexes, negatives_indexes = triplets.T
-                    if args.loss == "torch_triplet":
+                    if args.loss == "triplet":
                         loss += criterion(features[queries_indexes],
                                           features[positives_indexes],
                                           features[negatives_indexes])
