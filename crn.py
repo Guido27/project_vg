@@ -47,6 +47,7 @@ class CRN(torch.nn.Module):
         return x
 
 
-def _init_weights(c):
-    torch.nn.init.xavier_uniform_(c.weight)
-    c.bias.data.fill_(0)
+def _init_weights(m):
+    if isinstance(m, torch.nn.Conv2d):
+        torch.nn.init.xavier_uniform_(m.weight)
+        m.bias.data.fill_(0)
