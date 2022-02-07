@@ -40,6 +40,7 @@ class NetVLAD(nn.Module):
         soft_assign = F.softmax(soft_assign, dim=1)
 
         if crm is not None:
+            crm = crm.view(*crm.shape[:2], -1)  # Collapse spatial dimensions
             soft_assign *= crm
 
         x_flatten = x.view(N, C, -1)
