@@ -11,7 +11,9 @@ from math import ceil
 from tqdm import tqdm
 from netvlad import NetVLAD
 from pooling import GeM
+from crn import CRN
 from CBAM import CBAMBlock 
+
 
 class GeoLocalizationNet(nn.Module):
     """The model is composed of a backbone and an aggregation layer.
@@ -31,7 +33,8 @@ class GeoLocalizationNet(nn.Module):
         if args.mode == "netvlad":
             logging.debug(f"Using NetVLAD aggregation with {args.num_clusters} clusters")
             netvlad = NetVLAD(dim=args.features_dim, num_clusters=args.num_clusters)
-            self.aggregation = L2Norm() # nn.Identity() for passthrough
+            crn = CRN(args.features_dim)
+            self.aggregation = L2Norm()  # nn.Identity() for passthrough
             if args.resume is None:
                 logging.debug("Clustering for NetVLAD initialization")
                 centroids, descriptors = get_clusters(args, self)
@@ -55,7 +58,7 @@ class GeoLocalizationNet(nn.Module):
 
     def forward(self, x):
         x = self.backbone(x)
-        if self.attention:
+        if self.attention is not None:
             x = self.attention(x)
         x = self.aggregation(x)
         return x
