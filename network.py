@@ -23,18 +23,25 @@ class GeoLocalizationNet(nn.Module):
     def __init__(self, args):
         super().__init__()
         self.backbone = get_backbone(args)
-        self.attention = None
 
+        # CBAM
         if args.attention:
             print("Using CBAM attention module")
             self.attention = CBAMBlock(channel=256)
             self.attention.init_weights()
+        else:
+            self.attention = None
+
+        # CRN
+        if args.crn:
+            self.crn = CRN(args.features_dim)
+        else:
+            self.crn = None
 
         if args.mode == "netvlad":
             logging.debug(f"Using NetVLAD aggregation with {args.num_clusters} clusters")
             netvlad = NetVLAD(dim=args.features_dim, num_clusters=args.num_clusters)
-            crn = CRN(args.features_dim)
-            self.aggregation = L2Norm()  # nn.Identity() for passthrough
+            self.aggregation = None
             if args.resume is None:
                 logging.debug("Clustering for NetVLAD initialization")
                 centroids, descriptors = get_clusters(args, self)
@@ -45,22 +52,37 @@ class GeoLocalizationNet(nn.Module):
 
         elif args.mode == "gem":
             logging.debug("Using GeM aggregation")
-            self.aggregation = nn.Sequential(L2Norm(), GeM(), Flatten())
+            self.aggregation = nn.Sequential(GeM(), Flatten())
 
         elif args.mode == "avg_pool":
             logging.debug("Using Avg Pooling aggregation")
-            self.aggregation = nn.Sequential(L2Norm(),
-                                            nn.AdaptiveAvgPool2d(1),
-                                            Flatten())
+            self.aggregation = nn.Sequential(nn.AdaptiveAvgPool2d(1),
+                                             Flatten())
 
         else:
             raise RuntimeError(f"Unknown mode {args.mode}")
 
+        assert self.aggregation is not None
+
     def forward(self, x):
         x = self.backbone(x)
+
         if self.attention is not None:
             x = self.attention(x)
-        x = self.aggregation(x)
+
+        if self.crn is not None:
+            # contextual reweighting map
+            crm = self.crn(x)
+
+        # L2 normalization
+        x = F.normalize(x, p=2, dim=1)
+
+        if self.aggregation is not None:
+            if self.crn is not None:
+                x = self.aggregation(x, crm=crm)
+            else:
+                x = self.aggregation(x)
+
         return x
 
 

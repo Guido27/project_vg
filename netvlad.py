@@ -32,12 +32,15 @@ class NetVLAD(nn.Module):
         )
         self.conv.bias = None
 
-    def forward(self, x):
+    def forward(self, x, crm=None):
         N, C = x.shape[:2]
 
         # soft-assignment
         soft_assign = self.conv(x).view(N, self.num_clusters, -1)
         soft_assign = F.softmax(soft_assign, dim=1)
+
+        if crm is not None:
+            soft_assign *= crm
 
         x_flatten = x.view(N, C, -1)
 
