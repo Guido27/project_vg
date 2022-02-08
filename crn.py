@@ -22,10 +22,10 @@ class CRN(torch.nn.Module):
             out_ch_conv1 + out_ch_conv2 + out_ch_conv3, 1, 1
         )
 
-        # self.upsample = torch.nn.ConvTranspose2d(1, 1, 4, stride=2, padding=1, groups=1)
+        # self.upsample = torch.nn.ConvTranspose2d(1, 1, kernel_size=6, stride=(2, 3), padding=(0, 1), groups=1)
 
         for m in self.modules():
-            if isinstance(m, torch.nn.Conv2d):
+            if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.ConvTranspose2d):
                 torch.nn.init.kaiming_normal_(m.weight, nonlinearity="relu")
                 # torch.nn.init.xavier_uniform_(m.weight)
                 # if m.bias is not None:
@@ -44,6 +44,7 @@ class CRN(torch.nn.Module):
         x = F.relu(self.conv_accum(x))
 
         # Upsampling to restore input HxW
+        # x = self.upsample(x)
         x = F.interpolate(x, input_h_w)
 
         return x
