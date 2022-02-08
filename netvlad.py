@@ -40,8 +40,9 @@ class NetVLAD(nn.Module):
         soft_assign = F.softmax(soft_assign, dim=1)
 
         if crm is not None:
-            N_crm, C_crm = crm.shape[:2]
-            assert N_crm == N and C_crm == 1
+            assert (
+                crm.shape[0] == N and crm.shape[1] == 1 and crm.shape[2:] == x.shape[2:]
+            )
             soft_assign = torch.mul(soft_assign, crm.view(N, 1, -1))
 
         x_flatten = x.view(N, C, -1)
