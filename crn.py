@@ -46,7 +46,7 @@ class CRN(torch.nn.Module):
 
         # Upsampling to restore input HxW
         # x = F.relu(self.upsample(x))
-        x = F.interpolate(x, input_h_w, mode="bilinear")
+        x = F.interpolate(x, input_h_w)
 
         assert x.shape[2:] == input_h_w
 
