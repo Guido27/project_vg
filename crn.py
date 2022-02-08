@@ -24,7 +24,12 @@ class CRN(torch.nn.Module):
 
         # self.upsample = torch.nn.ConvTranspose2d(1, 1, 4, stride=2, padding=1, groups=1)
 
-        # self.apply(_init_weights)
+        for m in self.modules():
+            if isinstance(m, torch.nn.Conv2d):
+                torch.nn.init.kaiming_normal_(m.weight, nonlinearity="relu")
+                # torch.nn.init.xavier_uniform_(m.weight)
+                # if m.bias is not None:
+                #     torch.nn.init.zeros_(m.bias)
 
     def forward(self, x):
         input_h_w = x.shape[2:]
@@ -42,11 +47,3 @@ class CRN(torch.nn.Module):
         x = F.interpolate(x, input_h_w)
 
         return x
-
-
-def _init_weights(m):
-    if isinstance(m, torch.nn.Conv2d):
-        torch.nn.init.kaiming_uniform_(m.weight)
-        # torch.nn.init.xavier_uniform_(m.weight)
-        if m.bias is not None:
-            torch.nn.init.zeros_(m.bias)
