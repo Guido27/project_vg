@@ -54,10 +54,10 @@ class NetVLAD(nn.Module):
         # slower than non-looped, but lower memory usage
         for c in range(self.num_clusters):
             residual = x_flatten.unsqueeze(0).permute(1, 0, 2, 3) - self.centroids[
-                c : c + 1, :
+                c, :
             ].expand(x_flatten.size(-1), -1, -1).permute(1, 2, 0).unsqueeze(0)
-            residual *= soft_assign[:, c : c + 1, :].unsqueeze(2)
-            vlad[:, c : c + 1, :] = residual.sum(dim=-1)
+            residual *= soft_assign[:, c, :].unsqueeze(2)
+            vlad[:, c, :] = residual.sum(dim=-1)
 
         vlad = F.normalize(vlad, p=2, dim=2)  # intra-normalization
         vlad = vlad.view(N, -1)  # flatten
