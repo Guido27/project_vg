@@ -13,9 +13,9 @@ class CRN(torch.nn.Module):
         # self.downsample = torch.nn.AvgPool2d((3, 3), stride=(2, 2), padding=(0, 0))
         self.downsample = torch.nn.AdaptiveAvgPool2d(13)
 
-        self.conv1 = torch.nn.Conv2d(dim, out_ch_conv1, 5, padding=2)
+        self.conv1 = torch.nn.Conv2d(dim, out_ch_conv1, 3, padding=1)
 
-        self.conv2 = torch.nn.Conv2d(dim, out_ch_conv2, 3, padding=1)
+        self.conv2 = torch.nn.Conv2d(dim, out_ch_conv2, 5, padding=2)
 
         self.conv3 = torch.nn.Conv2d(dim, out_ch_conv3, 7, padding=3)
 
