@@ -25,10 +25,10 @@ class CRN(torch.nn.Module):
 
         # self.upsample = torch.nn.ConvTranspose2d(1, 1, 4, stride=2, padding=1, groups=1)
 
-        _init_weights(self.conv1)
-        _init_weights(self.conv2)
-        _init_weights(self.conv3)
-        _init_weights(self.conv_accum)
+        # _init_weights(self.conv1)
+        # _init_weights(self.conv2)
+        # _init_weights(self.conv3)
+        # _init_weights(self.conv_accum)
 
     def forward(self, x):
         input_h_w = x.shape[2:]
