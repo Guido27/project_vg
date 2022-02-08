@@ -26,7 +26,7 @@ class CRN(torch.nn.Module):
         # self.upsample = torch.nn.ConvTranspose2d(1, 1, kernel_size=5, stride=(2, 3), padding=(0, 1), output_padding=(1, 1))
 
         for m in self.modules():
-            if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.ConvTranspose2d):
+            if isinstance(m, torch.nn.Conv2d):
                 torch.nn.init.kaiming_normal_(m.weight, nonlinearity="relu")
                 # torch.nn.init.xavier_uniform_(m.weight)
                 # if m.bias is not None:
@@ -45,7 +45,7 @@ class CRN(torch.nn.Module):
         x = F.relu(self.conv_accum(x))
 
         # Upsampling to restore input HxW
-        # x = F.relu(self.upsample(x))
+        # x = self.upsample(x)
         x = F.interpolate(x, input_h_w)
 
         assert x.shape[2:] == input_h_w
