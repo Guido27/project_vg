@@ -75,13 +75,14 @@ def resume_from_state(state, model, optimizer, scheduler, restore_random=True):
 def get_optimizer(args, model):
     if args.attention == "crn":
         crn_lr = args.lr * args.crn_lr_mult
-        logging.debug(f"Using CRN lr = {crn_lr}")
+        dbg_msg_end = f", CRN lr = {crn_lr})"
         model_params = [
             {"params": model.backbone.parameters()},
             {"params": model.aggregation.parameters()},
             {"params": model.crn.parameters(), "lr": crn_lr},
         ]
     else:
+        dbg_msg_end = ")"
         model_params = model.parameters()
 
     if args.optim == "sgd":
@@ -89,9 +90,7 @@ def get_optimizer(args, model):
         weight_decay = 0.001
         scheduler_step_size = 5
         scheduler_gamma = 0.1
-        logging.debug(
-            f"Using SGD optimizer (lr: {args.lr}, momentum: {momentum}, weight-decay {weight_decay})"
-        )
+        dbg_msg = f"Using SGD optimizer (lr: {args.lr}, momentum: {momentum}, weight-decay {weight_decay}"
         optimizer = torch.optim.SGD(
             model_params, lr=args.lr, momentum=0.9, weight_decay=weight_decay
         )
@@ -99,11 +98,13 @@ def get_optimizer(args, model):
             optimizer, step_size=scheduler_step_size, gamma=scheduler_gamma
         )
     elif args.optim == "adam":
-        logging.debug(f"Using Adam optimizer (lr: {args.lr})")
+        dbg_msg = f"Using Adam optimizer (lr: {args.lr}"
         optimizer = torch.optim.Adam(model_params, lr=args.lr)
         scheduler = None
     else:
         raise RuntimeError(f"Unknown optimizer {args.optim}")
+
+    logging.debug(dbg_msg + dbg_msg_end)
 
     return optimizer, scheduler
 
