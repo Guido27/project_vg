@@ -22,7 +22,7 @@ class CRN(torch.nn.Module):
             out_ch_conv1 + out_ch_conv2 + out_ch_conv3, 1, 1
         )
 
-        # self.upsample = torch.nn.ConvTranspose2d(1, 1, kernel_size=5, stride=(2, 3), padding=(0, 1), output_padding=(1, 1), groups=1)
+        # self.upsample = torch.nn.ConvTranspose2d(1, 1, kernel_size=5, stride=(2, 3), padding=(0, 1), output_padding=(1, 1))
 
         for m in self.modules():
             if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.ConvTranspose2d):
