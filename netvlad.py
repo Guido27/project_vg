@@ -49,7 +49,7 @@ class NetVLAD(nn.Module):
 
         # calculate residuals to each clusters
         vlad = torch.zeros(
-            [N, self.num_clusters, C], dtype=x.dtype, layout=x.layout, device=x.device
+            (N, self.num_clusters, C), dtype=x.dtype, layout=x.layout, device=x.device
         )
         # slower than non-looped, but lower memory usage
         for c in range(self.num_clusters):
