@@ -6,17 +6,16 @@ class CRN(torch.nn.Module):
     def __init__(self, dim):
         super(CRN, self).__init__()
 
-        out_ch_conv1 = 32
-        out_ch_conv2 = 32
-        out_ch_conv3 = 20
-
         # self.downsample = torch.nn.AvgPool2d((3, 3), stride=(2, 2), padding=(0, 0))
         self.downsample = torch.nn.AdaptiveAvgPool2d(13)
 
+        out_ch_conv1 = 32
         self.conv1 = torch.nn.Conv2d(dim, out_ch_conv1, 3, padding=1)
 
+        out_ch_conv2 = 32
         self.conv2 = torch.nn.Conv2d(dim, out_ch_conv2, 5, padding=2)
 
+        out_ch_conv3 = 20
         self.conv3 = torch.nn.Conv2d(dim, out_ch_conv3, 7, padding=3)
 
         self.conv_accum = torch.nn.Conv2d(
