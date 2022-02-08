@@ -22,6 +22,7 @@ class CRN(torch.nn.Module):
             out_ch_conv1 + out_ch_conv2 + out_ch_conv3, 1, 1
         )
 
+        # Only for 13x13 -> 30x40
         # self.upsample = torch.nn.ConvTranspose2d(1, 1, kernel_size=5, stride=(2, 3), padding=(0, 1), output_padding=(1, 1))
 
         for m in self.modules():
@@ -46,5 +47,7 @@ class CRN(torch.nn.Module):
         # Upsampling to restore input HxW
         # x = self.upsample(x)
         x = F.interpolate(x, input_h_w)
+
+        assert x.shape[2:] == input_h_w
 
         return x
