@@ -69,7 +69,7 @@ if checkpoint is None:
     not_improved_num = 0
 else:
     last_epoch_num, recalls, best_r5, not_improved_num = util.resume_from_state(checkpoint, model, optimizer, scheduler)
-    if recalls[1] > best_r5: best_r5 = recalls[1]
+    best_r5 = max(best_r5, recalls[1])
     logging.debug(f"Successfully loaded model from checkpoint (epoch: {last_epoch_num}, recalls: {recalls})")
 del checkpoint
 
@@ -167,11 +167,6 @@ if not args.test_only:
 
         is_best = recalls[1] > best_r5
 
-        # Save checkpoint, which contains all training parameters
-        state = util.make_state(args, epoch_num, model, optimizer, scheduler, recalls, best_r5, not_improved_num)
-        util.save_checkpoint(args, state, is_best, filename=f"model_{epoch_num:02d}.pth")
-
-        # If recall@5 did not improve for "many" epochs, stop training
         if is_best:
             logging.info(f"Improved: previous best R@5 = {best_r5:.1f}, current R@5 = {recalls[1]:.1f}")
             best_r5 = recalls[1]
@@ -179,9 +174,15 @@ if not args.test_only:
         else:
             not_improved_num += 1
             logging.info(f"Not improved: {not_improved_num} / {args.patience}: best R@5 = {best_r5:.1f}, current R@5 = {recalls[1]:.1f}")
-            if not_improved_num >= args.patience:
-                logging.info(f"Performance did not improve for {not_improved_num} epochs. Stop training.")
-                break
+
+        # Save checkpoint, which contains all training parameters
+        state = util.make_state(args, epoch_num, model, optimizer, scheduler, recalls, best_r5, not_improved_num)
+        util.save_checkpoint(args, state, is_best, filename=f"model_{epoch_num:02d}.pth")
+
+        # If recall@5 did not improve for "many" epochs, stop training
+        if not_improved_num >= args.patience:
+            logging.info(f"Performance did not improve for {not_improved_num} epochs. Stop training.")
+            break
 
     logging.info(f"Best R@5: {best_r5:.1f}")
     logging.info(f"Trained for {epoch_num:02d} epochs, in total in {str(datetime.now() - start_time)[:-7]}")
@@ -192,4 +193,3 @@ if not args.test_only:
 
 recalls, recalls_str = test.test(args, test_ds, model)
 logging.info(f"Recalls on {test_ds}: {recalls_str}")
-
