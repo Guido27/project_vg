@@ -31,7 +31,7 @@ def make_state(
         "random_state": random.getstate(),
         "numpy_random_state": np.random.get_state(),
         "torch_random_state": torch.get_rng_state(),
-        "torch_cuda_random_state": torch.cuda.get_rng_state(),  # TO-DO: check if needed
+        "torch_cuda_random_state": torch.cuda.get_rng_state(),
     }
 
 
@@ -52,7 +52,7 @@ def load_args_from_state(state, parsed_args):
     return args
 
 
-def resume_from_state(state, model, optimizer, scheduler, restore_random=True):
+def resume_from_state(state, model, optimizer, scheduler, restore_random=False):
     model.load_state_dict(state["model_state_dict"])
     optimizer.load_state_dict(state["optimizer_state_dict"])
     if scheduler is not None:
@@ -66,9 +66,7 @@ def resume_from_state(state, model, optimizer, scheduler, restore_random=True):
         random.setstate(state["random_state"])
         np.random.set_state(state["numpy_random_state"])
         torch.set_rng_state(state["torch_random_state"])
-        torch.cuda.set_rng_state(
-            state["torch_cuda_random_state"]
-        )  # TO-DO: check if needed
+        torch.cuda.set_rng_state(state["torch_cuda_random_state"])
     return epoch_num, recalls, best_r5, not_improved_num
 
 
