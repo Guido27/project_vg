@@ -6,8 +6,10 @@ class CRN(torch.nn.Module):
     def __init__(self, dim):
         super(CRN, self).__init__()
 
-        # self.downsample = torch.nn.AvgPool2d((3, 3), stride=(2, 2), padding=(0, 0))
-        self.downsample = torch.nn.AdaptiveAvgPool2d(13)
+        # Fixed "internal" image HxW
+        self.h_w = (13, 13)
+
+        self.downsample = torch.nn.AdaptiveAvgPool2d(self.h_w)
 
         out_ch_conv1 = 32
         self.conv1 = torch.nn.Conv2d(dim, out_ch_conv1, 3, padding=1)
@@ -23,7 +25,9 @@ class CRN(torch.nn.Module):
         )
 
         # Only for 13x13 -> 30x40
-        # self.upsample = torch.nn.ConvTranspose2d(1, 1, kernel_size=5, stride=(2, 3), padding=(0, 1), output_padding=(1, 1))
+        self.upsample = torch.nn.ConvTranspose2d(
+            1, 1, kernel_size=5, stride=(2, 3), padding=(0, 1), output_padding=(1, 1)
+        )
 
         for m in self.modules():
             if isinstance(m, torch.nn.Conv2d):
@@ -36,7 +40,8 @@ class CRN(torch.nn.Module):
         input_h_w = x.shape[2:]
         assert len(input_h_w) == 2
 
-        x = self.downsample(x)
+        # x = self.downsample(x)
+        x = F.interpolate(x, self.h_w)
 
         x1 = F.relu(self.conv1(x))
         x2 = F.relu(self.conv2(x))
