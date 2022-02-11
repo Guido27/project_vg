@@ -49,6 +49,7 @@ def load_args_from_state(state, parsed_args):
     args.patience = parsed_args.patience
     args.resume = parsed_args.resume
     args.test_only = parsed_args.test_only
+    args.ds = parsed_args.ds
     return args
 
 
