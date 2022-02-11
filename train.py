@@ -43,18 +43,18 @@ logging.info(f"Using {torch.cuda.device_count()} GPUs and {multiprocessing.cpu_c
 logging.debug(f"Loading dataset Pitts30k from folder {args.datasets_folder}")
 
 if not args.test_only:
-    triplets_ds = datasets_ws.TripletsDataset(args, args.datasets_folder, "pitts30k", "train", args.negs_num_per_query)
+    triplets_ds = datasets_ws.TripletsDataset(args, args.datasets_folder, args.ds, "train", args.negs_num_per_query)
     logging.info(f"Train query set: {triplets_ds}")
 
-    val_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "val")
+    val_ds = datasets_ws.BaseDataset(args, args.datasets_folder, args.ds, "val")
     logging.info(f"Val set: {val_ds}")
 
-test_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "test")
+test_ds = datasets_ws.BaseDataset(args, args.datasets_folder, args.ds, "test")
 logging.info(f"Test set: {test_ds}")
 
 #### Initialize model
 if args.resume is None and args.mode == "netvlad":
-    args.cluster_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "train")
+    args.cluster_ds = datasets_ws.BaseDataset(args, args.datasets_folder, args.ds, "train")
 model = network.GeoLocalizationNet(args)
 model = model.to(args.device)
 

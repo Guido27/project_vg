@@ -57,6 +57,8 @@ def parse_arguments():
                         help="The attention mode to use (CBAM or CRN), if any")
     parser.add_argument("--crn_lr_mult", type=int, default=50,
                         help="Multiplier of the lr to use for the CRN")
+    parser.add_argument("--ds", type=str, default="pitts30k", choices=["pitts30k", "st_lucia"],
+                        help="The dataset to use")
 
     # NetVLAD only
     parser.add_argument("--num_clusters", type=int, default=64,
