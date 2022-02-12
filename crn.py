@@ -11,23 +11,23 @@ class CRN(torch.nn.Module):
         self.downsample = torch.nn.AdaptiveAvgPool2d(self.h_w)
 
         # Filters
-        n_filters_1 = 32  # 3x3
-        n_filters_2 = 32  # 5x5
-        n_filters_3 = 20  # 7x7
-        self.conv1 = torch.nn.Conv2d(dim, n_filters_1, 3, padding=1)
-        self.conv2 = torch.nn.Conv2d(dim, n_filters_2, 5, padding=2)
-        self.conv3 = torch.nn.Conv2d(dim, n_filters_3, 7, padding=3)
-        self.conv_accum = torch.nn.Conv2d(n_filters_1 + n_filters_2 + n_filters_3, 1, 1)
+        n_filters = [32, 32, 20]  # 3x3, 5x5, 7x7
+        self.conv1 = torch.nn.Conv2d(dim, n_filters[0], 3, padding=1)
+        self.conv2 = torch.nn.Conv2d(dim, n_filters[1], 5, padding=2)
+        self.conv3 = torch.nn.Conv2d(dim, n_filters[2], 7, padding=3)
+        self.conv_accum = torch.nn.Conv2d(sum(n_filters), 1, 1)
 
         # Only for 13x13 -> 30x40
         # self.upsample = torch.nn.ConvTranspose2d(1, 1, kernel_size=5, stride=(2, 3), padding=(0, 1), output_padding=(1, 1))
 
         for m in self.modules():
             if isinstance(m, torch.nn.Conv2d):
-                torch.nn.init.kaiming_normal_(m.weight, nonlinearity="relu")
+                torch.nn.init.kaiming_normal_(
+                    m.weight, mode="fan_out", nonlinearity="relu"
+                )
                 # torch.nn.init.xavier_uniform_(m.weight)
-                # if m.bias is not None:
-                #     torch.nn.init.zeros_(m.bias)
+                if m.bias is not None:
+                    torch.nn.init.zeros_(m.bias)
 
     def forward(self, x):
         input_h_w = x.shape[2:]
