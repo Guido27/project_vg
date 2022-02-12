@@ -66,11 +66,3 @@ class CBAMBlock(nn.Module):
         out = x * self.ca(x)
         out = out * self.sa(out)
         return out + residual
-
-
-if __name__ == "__main__":
-    input = torch.randn(50, 512, 7, 7)
-    kernel_size = input.shape[2]
-    cbam = CBAMBlock(channel=512, reduction=16, kernel_size=kernel_size)
-    output = cbam(input)
-    print(output.shape)
