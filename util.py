@@ -53,7 +53,7 @@ def load_args_from_state(state, parsed_args):
     return args
 
 
-def resume_from_state(state, model, optimizer, scheduler, restore_random=False):
+def resume_from_state(state, model, optimizer, scheduler, restore_random=True):
     model.load_state_dict(state["model_state_dict"])
     optimizer.load_state_dict(state["optimizer_state_dict"])
     if scheduler is not None:
