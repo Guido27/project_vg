@@ -43,18 +43,18 @@ logging.info(f"Using {torch.cuda.device_count()} GPUs and {multiprocessing.cpu_c
 logging.debug(f"Loading dataset Pitts30k from folder {args.datasets_folder}")
 
 if not args.test_only:
-    triplets_ds = datasets_ws.TripletsDataset(args, args.datasets_folder, "pitts30k", "train", args.negs_num_per_query)
+    triplets_ds = datasets_ws.TripletsDataset(args, args.datasets_folder, args.ds, "train", args.negs_num_per_query)
     logging.info(f"Train query set: {triplets_ds}")
 
-    val_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "val")
+    val_ds = datasets_ws.BaseDataset(args, args.datasets_folder, args.ds, "val")
     logging.info(f"Val set: {val_ds}")
 
-test_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "test")
+test_ds = datasets_ws.BaseDataset(args, args.datasets_folder, args.ds, "test")
 logging.info(f"Test set: {test_ds}")
 
 #### Initialize model
 if args.resume is None and args.mode == "netvlad":
-    args.cluster_ds = datasets_ws.BaseDataset(args, args.datasets_folder, "pitts30k", "train")
+    args.cluster_ds = datasets_ws.BaseDataset(args, args.datasets_folder, args.ds, "train")
 model = network.GeoLocalizationNet(args)
 model = model.to(args.device)
 
@@ -69,7 +69,7 @@ if checkpoint is None:
     not_improved_num = 0
 else:
     last_epoch_num, recalls, best_r5, not_improved_num = util.resume_from_state(checkpoint, model, optimizer, scheduler)
-    if recalls[1] > best_r5: best_r5 = recalls[1]
+    best_r5 = max(best_r5, recalls[1])
     logging.debug(f"Successfully loaded model from checkpoint (epoch: {last_epoch_num}, recalls: {recalls})")
 del checkpoint
 
@@ -116,32 +116,31 @@ if not args.test_only:
                 # Compute features of all images (images contains queries, positives and negatives)
                 features = model(images.to(args.device))
                 loss = 0
-
                 
                 triplets_local_indexes = torch.transpose(
                     triplets_local_indexes.view(args.train_batch_size, args.negs_num_per_query, 3), 1, 0)
                 for triplets in triplets_local_indexes:
                     queries_indexes, positives_indexes, negatives_indexes = triplets.T
-                    if args.loss == "torch_triplet":
+                    if args.loss == "triplet":
                         loss += criterion(features[queries_indexes],
                                           features[positives_indexes],
                                           features[negatives_indexes])
                     else:
                         output_features = torch.Tensor().to(args.device)
-                        #queries_indexes,positive_indexes and negative_indexes have the same length
+                        # queries_indexes,positive_indexes and negative_indexes have the same length
                         for x in range(len(queries_indexes)):
-                            #get queri, pos and neg index
+                            # get query, pos and neg index
                             q = queries_indexes[x]
                             p = positives_indexes[x]
                             n = negatives_indexes[x]
-                            #get corresponding features
-                            queri = features[q]
+                            # get corresponding features
+                            query = features[q]
                             positive = features[p]
                             negative = features[n]
-                            #update input tensor for sare_loss
-                            output_features = torch.cat((output_features, queri, positive, negative))
-                        #loss
-                        loss += sare_loss.get_loss(output_features,args.loss,args.train_batch_size,3)
+                            # update input tensor for sare_loss
+                            output_features = torch.cat((output_features, query, positive, negative))
+                        # loss
+                        loss += sare_loss.get_loss(output_features, args.loss, args.train_batch_size, 3)
 
                 del features
                 loss /= (args.train_batch_size * args.negs_num_per_query)
@@ -168,11 +167,6 @@ if not args.test_only:
 
         is_best = recalls[1] > best_r5
 
-        # Save checkpoint, which contains all training parameters
-        state = util.make_state(args, epoch_num, model, optimizer, scheduler, recalls, best_r5, not_improved_num)
-        util.save_checkpoint(args, state, is_best, filename=f"model_{epoch_num:02d}.pth")
-
-        # If recall@5 did not improve for "many" epochs, stop training
         if is_best:
             logging.info(f"Improved: previous best R@5 = {best_r5:.1f}, current R@5 = {recalls[1]:.1f}")
             best_r5 = recalls[1]
@@ -180,9 +174,15 @@ if not args.test_only:
         else:
             not_improved_num += 1
             logging.info(f"Not improved: {not_improved_num} / {args.patience}: best R@5 = {best_r5:.1f}, current R@5 = {recalls[1]:.1f}")
-            if not_improved_num >= args.patience:
-                logging.info(f"Performance did not improve for {not_improved_num} epochs. Stop training.")
-                break
+
+        # Save checkpoint, which contains all training parameters
+        state = util.make_state(args, epoch_num, model, optimizer, scheduler, recalls, best_r5, not_improved_num)
+        util.save_checkpoint(args, state, is_best, filename=f"model_{epoch_num:02d}.pth")
+
+        # If recall@5 did not improve for "many" epochs, stop training
+        if not_improved_num >= args.patience:
+            logging.info(f"Performance did not improve for {not_improved_num} epochs. Stop training.")
+            break
 
     logging.info(f"Best R@5: {best_r5:.1f}")
     logging.info(f"Trained for {epoch_num:02d} epochs, in total in {str(datetime.now() - start_time)[:-7]}")
@@ -193,4 +193,3 @@ if not args.test_only:
 
 recalls, recalls_str = test.test(args, test_ds, model)
 logging.info(f"Recalls on {test_ds}: {recalls_str}")
-
