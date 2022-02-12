@@ -6,23 +6,18 @@ class CRN(torch.nn.Module):
     def __init__(self, dim):
         super(CRN, self).__init__()
 
-        # Fixed "internal" image HxW
-        self.h_w = (13, 13)
-
+        # Downsampling
+        self.h_w = (13, 13)  # fixed "internal" image size
         self.downsample = torch.nn.AdaptiveAvgPool2d(self.h_w)
 
-        out_ch_conv1 = 32
-        self.conv1 = torch.nn.Conv2d(dim, out_ch_conv1, 3, padding=1)
-
-        out_ch_conv2 = 32
-        self.conv2 = torch.nn.Conv2d(dim, out_ch_conv2, 5, padding=2)
-
-        out_ch_conv3 = 20
-        self.conv3 = torch.nn.Conv2d(dim, out_ch_conv3, 7, padding=3)
-
-        self.conv_accum = torch.nn.Conv2d(
-            out_ch_conv1 + out_ch_conv2 + out_ch_conv3, 1, 1
-        )
+        # Filters
+        n_filters_1 = 32  # 3x3
+        n_filters_2 = 32  # 5x5
+        n_filters_3 = 20  # 7x7
+        self.conv1 = torch.nn.Conv2d(dim, n_filters_1, 3, padding=1)
+        self.conv2 = torch.nn.Conv2d(dim, n_filters_2, 5, padding=2)
+        self.conv3 = torch.nn.Conv2d(dim, n_filters_3, 7, padding=3)
+        self.conv_accum = torch.nn.Conv2d(n_filters_1 + n_filters_2 + n_filters_3, 1, 1)
 
         # Only for 13x13 -> 30x40
         # self.upsample = torch.nn.ConvTranspose2d(1, 1, kernel_size=5, stride=(2, 3), padding=(0, 1), output_padding=(1, 1))
@@ -36,7 +31,6 @@ class CRN(torch.nn.Module):
 
     def forward(self, x):
         input_h_w = x.shape[2:]
-        assert len(input_h_w) == 2
 
         x = self.downsample(x)
         # x = F.interpolate(x, self.h_w)
