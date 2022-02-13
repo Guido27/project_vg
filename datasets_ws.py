@@ -13,9 +13,30 @@ import torchvision.transforms as transforms
 from torch.utils.data.dataset import Subset
 from sklearn.neighbors import NearestNeighbors
 from torch.utils.data.dataloader import DataLoader
+import parser
 
+args = parser.parse_arguments()
 
-base_transform = transforms.Compose([
+###Transformation for training
+
+if args.augment == "color_jitter":
+    base_transform = transforms.Compose([
+        transforms.ColorJitter(brightness=2),
+        transforms.ColorJitter(contrast=2),
+        transforms.ColorJitter(saturation=2),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+
+elif args.augment is None:
+    base_transform = transforms.Compose([
+        # transforms.Resize((525, 700)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+
+#Transformations for testing
+base_transform_test = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
@@ -84,7 +105,7 @@ class BaseDataset(data.Dataset):
     
     def __getitem__(self, index):
         img = path_to_pil_img(self.images_paths[index])
-        img = base_transform(img)
+        img = base_transform_test(img)
         return img, index
     
     def __len__(self):
