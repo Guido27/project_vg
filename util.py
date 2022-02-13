@@ -50,6 +50,7 @@ def load_args_from_state(state, parsed_args):
     args.resume = parsed_args.resume
     args.test_only = parsed_args.test_only
     args.ds = parsed_args.ds
+    args.val_positive_dist_threshold = parsed_args.val_positive_dist_threshold
     return args
 
 
