@@ -14,15 +14,3 @@ class GeM(nn.Module):
         return F.avg_pool2d(
             x.clamp(min=self.eps).pow(self.p), (x.size(-2), x.size(-1))
         ).pow(1.0 / self.p)
-
-    def __repr__(self):
-        return (
-            self.__class__.__name__
-            + "("
-            + "p="
-            + "{:.4f}".format(self.p.data.tolist()[0])
-            + ", "
-            + "eps="
-            + str(self.eps)
-            + ")"
-        )
