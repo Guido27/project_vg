@@ -9,9 +9,9 @@ import faiss
 from math import ceil
 from tqdm import tqdm
 from netvlad import NetVLAD
-from pooling import GeM
+from gem import GeM
 from crn import CRN
-from CBAM import CBAMBlock
+from cbam import CBAMBlock
 
 
 class GeoLocalizationNet(nn.Module):
